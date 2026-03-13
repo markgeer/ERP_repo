@@ -66,31 +66,31 @@ export class Login {
     }
   }
 
-  // // Método para verificar si un campo es inválido
-  // isFieldInvalid(fieldName: string): boolean {
-  //   if (!this.submitted) return false;
+  // Método para verificar si un campo es inválido
+  isFieldInvalid(fieldName: string): boolean {
+    if (!this.submitted) return false;
 
-  //   switch(fieldName) {
-  //     case 'username':
-  //       return this.loginData.username.trim() === '';
-  //     case 'password':
-  //       return this.loginData.password.trim() === '';
-  //     default:
-  //       return false;
-  //   }
-  // }
+    switch(fieldName) {
+      case 'username':
+        return this.loginData.username.trim() === '';
+      case 'password':
+        return this.loginData.password.trim() === '';
+      default:
+        return false;
+    }
+  }
 
-  // // Método para obtener el mensaje de error
-  // getErrorMessage(fieldName: string): string {
-  //   if (!this.submitted) return '';
+  // Método para obtener el mensaje de error
+  getErrorMessage(fieldName: string): string {
+    if (!this.submitted) return '';
 
-  //   switch(fieldName) {
-  //     case 'username':
-  //       return 'El usuario es requerido';
-  //     case 'password':
-  //       return 'La contraseña es requerida';
-  //     default:
-  //       return '';
-  //   }
-  // }
+    switch(fieldName) {
+      case 'username':
+        return 'El usuario es requerido';
+      case 'password':
+        return 'La contraseña es requerida';
+      default:
+        return '';
+    }
+  }
 }
