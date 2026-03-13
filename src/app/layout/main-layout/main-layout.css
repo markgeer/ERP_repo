@@ -1,0 +1,19 @@
+.layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+}
+
+.layout-main {
+  flex: 1;
+  padding: 2rem;
+  background-color: #000000;
+  margin-left: 250px; /* Mismo ancho que el sidebar */
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .layout-main {
+    margin-left: 0;
+    padding: 1rem;
+  }
+}

@@ -1,0 +1,31 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h2>Mi App</h2>
+  </div>
+
+  <div class="user-info">
+    <p-avatar 
+      icon="pi pi-user" 
+      shape="circle" 
+      size="large"
+      styleClass="user-avatar"
+    ></p-avatar>
+    <div class="user-details">
+      <span class="user-name">{{ user.name }}</span>
+      <span class="user-email">{{ user.email }}</span>
+    </div>
+  </div>
+
+  <div class="sidebar-menu">
+    <p-menu [model]="items" styleClass="custom-menu"></p-menu>
+  </div>
+
+  <div class="sidebar-footer">
+    <p-button 
+      label="Cerrar Sesión"
+      icon="pi pi-sign-out"
+      styleClass="p-button-text p-button-plain"
+      (onClick)="logout()"
+    ></p-button>
+  </div>
+</div>

@@ -1,0 +1,26 @@
+.home-container {
+  background: linear-gradient(180deg, #000000 0%, #1e0635 100%);
+  padding: 2rem;
+  min-height: 100vh;
+}
+
+.welcome-section {
+  margin-bottom: 2rem;
+}
+
+.welcome-section h1,
+.welcome-section p {
+  color: rgb(255, 255, 255);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  cursor: pointer;
+}
+

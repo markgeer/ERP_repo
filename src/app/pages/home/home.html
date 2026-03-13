@@ -1,0 +1,97 @@
+<div class="home-container">
+  <!-- Header con bienvenida -->
+  <div class="welcome-section">
+    <h1>¡Bienvenido de nuevo!</h1>
+    <p>Aquí tienes un resumen de tu actividad reciente</p>
+  </div>
+
+  <!-- Tarjetas de estadísticas -->
+  <div class="stats-grid">
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <i class="pi pi-users stat-icon"></i>
+        <div class="stat-info">
+          <span class="stat-label">Usuarios</span>
+          <span class="stat-value"></span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="stat-card2">
+      <div class="stat-content">
+        <i class="pi pi-chart-line stat-icon"></i>
+        <div class="stat-info">
+          <span class="stat-label">N</span>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- <p-card class="stat-card">
+      <div class="stat-content">
+        <i class="pi pi-shopping-cart stat-icon"></i>
+        <div class="stat-info">
+          <span class="stat-label">Pedidos</span>
+          <span class="stat-value">89</span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="stat-card">
+      <div class="stat-content">
+        <i class="pi pi-star stat-icon"></i>
+        <div class="stat-info">
+          <span class="stat-label">Valoración</span>
+          <span class="stat-value">4.8/5</span>
+        </div>
+      </div>
+    </p-card> -->
+  </div>
+
+  <!-- Tabla de actividades (sin gráfico)
+  <div class="activities-section">
+    <p-card header="Actividades Recientes" class="activities-card">
+      <p-table [value]="recentActivities" [paginator]="true" [rows]="5">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Acción</th>
+            <th>Usuario</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-activity>
+          <tr>
+            <td>{{ activity.action }}</td>
+            <td>{{ activity.user }}</td>
+            <td>{{ activity.date }}</td>
+            <td>
+              <p-tag 
+                [value]="activity.status" 
+                [severity]="getStatusSeverity(activity.status)"
+              ></p-tag>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div> -->
+
+  <!-- Botones de acción rápida -->
+  <div class="quick-actions">
+    <p-button 
+      label="Boton 1" 
+      icon="pi pi-plus"
+      styleClass="p-button-primary"
+    ></p-button>
+    <p-button 
+      label="Boton 2" 
+      icon="pi pi-download"
+      styleClass="p-button-outlined"
+    ></p-button>
+    <!-- <p-button 
+      label="Configuración" 
+      icon="pi pi-cog"
+      styleClass="p-button-text"
+    ></p-button> -->
+  </div>
+</div>
