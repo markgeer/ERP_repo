@@ -1,0 +1,46 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #000000 0%, #1e0635 100%);
+  padding: 1rem;
+}
+
+.login-card {
+  outline: 1px solid #ffffff;
+  outline-offset: 6px;
+  background-color: rgba(240, 248, 255, 0.088);
+  width: 100%;
+  max-width: 400px;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field label {
+  display: block;
+}
+
+.p-error {
+  color: rgb(197, 0, 0);
+  display: block;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+}
+
+.register-link p {
+  color: rgba(124, 124, 124, 0.8);
+  margin: 0;
+}
+
+.register-link a {
+  color: white;
+  font-weight: 500;
+  text-decoration: none;
+}

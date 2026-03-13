@@ -1,20 +1,75 @@
 <div class="login-container">
   <p-card header="Iniciar Sesión" class="login-card">
+    
+    <form #loginForm="ngForm" (ngSubmit)="onSubmit()">
+      <div class="p-fluid">
 
-    <div class="p-fluid">
+        <!-- Campo de Usuario -->
+        <div class="field">
+          <label for="username">Usuario</label>
+          <input 
+            id="username"
+            type="text" 
+            pInputText 
+            [(ngModel)]="loginData.username"
+            name="username"
+            [class.ng-invalid]="isFieldInvalid('username')"
+            placeholder="Ingrese su usuario"
+            required
+          />
+          
+          <small 
+            *ngIf="isFieldInvalid('username')" 
+            class="p-error"
+          >
+            {{ getErrorMessage('username') }}
+          </small>
+        </div>
 
-      <div class="field">
-        <label>Usuario</label>
-        <input pInputText />
+        <!-- Campo de Contraseña -->
+        <div class="field">
+          <label for="password">Contraseña</label>
+          <p-password 
+            id="password"
+            [(ngModel)]="loginData.password"
+            name="password"
+            [class.ng-invalid]="isFieldInvalid('password')"
+            placeholder="Ingrese su contraseña"
+            [toggleMask]="true"
+            [feedback]="false"
+            required
+          ></p-password>
+          
+          <small 
+            *ngIf="isFieldInvalid('password')" 
+            class="p-error"
+          >
+            {{ getErrorMessage('password') }}
+          </small>
+        </div>
+
+        <!-- Botón de envío -->
+        <p-button 
+          type="submit"
+          label="Entrar"
+          icon="pi pi-sign-in"
+          [disabled]="!validateForm() && submitted"
+          styleClass="p-button-primary"
+          [fluid]="true"
+        ></p-button>
+
+        <!-- Enlace a registro -->
+        <div class="register-link">
+          <p>¿No tienes cuenta? <a href="/register">Regístrate aquí</a></p>
+        </div>
+
       </div>
+    </form>
 
-      <div class="field">
-        <label>Contraseña</label>
-        <input type="password" pInputText />
-      </div>
-
-      <button pButton label="Entrar" icon="pi pi-sign-in"></button>
-
+    <!-- Mensaje informativo -->
+    <div class="login-info">
+      <p><small>Credenciales de prueba:</small></p>
+      <p><small>Usuario: admin | Contraseña: Admin123!</small></p>
     </div>
 
   </p-card>

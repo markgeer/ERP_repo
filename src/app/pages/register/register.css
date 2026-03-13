@@ -1,0 +1,79 @@
+.register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #000000 0%, #1e0635 100%);
+  padding: 1rem;
+}
+
+.register-card {
+  outline: 1px solid #ffffff;
+  outline-offset: 6px;
+  background-color: rgba(240, 248, 255, 0.088);
+  width: 100%;
+  max-width: 500px;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field label {
+  
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.p-error {
+  color: rgb(197, 0, 0);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.p-valid {
+  color: #22c55e;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--surface-200);
+}
+
+.login-link a {
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.password-requirements {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  background-color: var(--surface-50);
+  border-radius: 6px;
+}
+
+.password-requirements ul {
+  margin: 0.5rem 0 0 0;
+  padding-left: 1.5rem;
+}
+
+/* PrimeNG width overrides */
+:host ::ng-deep .p-password,
+:host ::ng-deep .p-datepicker {
+  width: 100%;
+}
+
+:host ::ng-deep .p-password input {
+  width: 100%;
+}
