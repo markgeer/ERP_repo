@@ -23,9 +23,19 @@ export class Sidebar {
 
     this.items = [
       {
-        label: 'Inicio',
+        label: 'Dashcboard',
         icon: 'pi pi-home',
         routerLink: ['/home']
+      },
+      {
+        label: 'tickets',
+        icon: 'pi pi-user',
+        routerLink: ['/profile']
+      },
+      {
+        label: 'Grupos',
+        icon: 'pi pi-cog',
+        routerLink: ['/settings']
       },
       {
         label: 'Perfil',
@@ -33,18 +43,18 @@ export class Sidebar {
         routerLink: ['/profile']
       },
       {
-        label: 'Configuración',
+        label: 'Ayuda',
         icon: 'pi pi-cog',
         routerLink: ['/settings']
       },
-      {
-        separator: true
-      },
-      {
-        label: 'Cerrar Sesión',
-        icon: 'pi pi-sign-out',
-        command: () => this.logout()
-      }
+      // {
+      //   separator: true
+      // },
+      // {
+      //   label: 'Cerrar Sesión',
+      //   icon: 'pi pi-sign-out',
+      //   command: () => this.logout()
+      // }
     ];
   }
 
