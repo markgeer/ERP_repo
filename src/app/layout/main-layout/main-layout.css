@@ -1,19 +1,31 @@
+/* Eliminar cualquier fondo oscuro */
 .layout-wrapper {
   display: flex;
   min-height: 100vh;
+  width: 100%;
+  background-color: #171717;  /* Cambiado a blanco */
 }
 
 .layout-main {
   flex: 1;
+  margin-left: 250px;
   padding: 2rem;
-  background-color: #000000;
-  margin-left: 250px; /* Mismo ancho que el sidebar */
-  transition: margin-left 0.3s ease;
+  background-color: #171717;
+  min-height: 100vh;
+  width: calc(100% - 250px);  /* Ancho exacto restando el sidebar */
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
   .layout-main {
     margin-left: 0;
+    width: 100%;  /* En móvil ocupa todo */
     padding: 1rem;
   }
+}
+
+/* Forzar que todo el contenido de las rutas tenga fondo blanco */
+::ng-deep .layout-main > * {
+  background-color: #ffffff;
+  min-height: 100%;
 }

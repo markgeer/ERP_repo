@@ -1,0 +1,8 @@
+/* Fuerza a todos los contenedores raíz a ocupar el 100% */
+html, body, app-root {
+  height: 100% !important;
+  min-height: 100vh !important;
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff; /* Si el fondo es blanco, que el body también lo sea */
+}

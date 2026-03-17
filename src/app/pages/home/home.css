@@ -1,5 +1,4 @@
 .home-container {
-  background: linear-gradient(180deg, #000000 0%, #1e0635 100%);
   padding: 2rem;
   min-height: 100vh;
 }
@@ -13,14 +12,18 @@
   color: rgb(255, 255, 255);
 }
 
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
 .stat-card {
+  background-color: rgb(80, 80, 80);
   cursor: pointer;
+  width: 100px;
+  height: 60px;
+}
+.stat-card2 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  background-color: rgb(80, 80, 80);
+  cursor: pointer;
+  width: 100px;
+  height: 60px;
 }
 
