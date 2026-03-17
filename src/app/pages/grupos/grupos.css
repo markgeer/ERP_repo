@@ -1,0 +1,84 @@
+.grupos-container {
+  padding: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #000000 0%, #1e0635 100%);
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: white;
+}
+
+.p-error {
+  color: rgb(197, 0, 0);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+/* Estilos para PrimeNG */
+:host ::ng-deep .p-card {
+  background: rgba(240, 248, 255, 0.088) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white !important;
+}
+
+:host ::ng-deep .p-card-header {
+  color: white !important;
+  padding: 1rem 1.5rem !important;
+  font-size: 1.3rem;
+}
+
+:host ::ng-deep .p-datatable {
+  background: transparent !important;
+  color: white !important;
+}
+
+:host ::ng-deep .p-datatable-thead > tr > th {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: white !important;
+  border: none !important;
+  padding: 1rem !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr {
+  background: transparent !important;
+  color: white !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr > td {
+  background: transparent !important;
+  border: none !important;
+  padding: 0.75rem 1rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+:host ::ng-deep .p-datatable-tbody > tr:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
+:host ::ng-deep .p-inputnumber {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+}
+
+:host ::ng-deep .p-inputtext::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+:host ::ng-deep .p-toolbar {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 0 1rem 0 !important;
+}

@@ -23,7 +23,7 @@ export class Sidebar {
 
     this.items = [
       {
-        label: 'Dashcboard',
+        label: 'Dashboard',
         icon: 'pi pi-home',
         routerLink: ['/home']
       },
@@ -35,7 +35,7 @@ export class Sidebar {
       {
         label: 'Grupos',
         icon: 'pi pi-cog',
-        routerLink: ['/settings']
+        routerLink: ['./grupos']
       },
       {
         label: 'Perfil',

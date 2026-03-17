@@ -5,6 +5,8 @@ import { Auth } from './pages/auth/auth';
 import { Register } from './pages/register/register';
 import { Home } from './pages/home/home';
 import { MainLayout } from './layout/main-layout/main-layout';
+import { GruposComponent } from './pages/grupos/grupos';
+
 
 export const routes: Routes = [
   // Rutas públicas (sin layout)
@@ -19,6 +21,7 @@ export const routes: Routes = [
     component: MainLayout,
     children: [
       { path: 'home', component: Home },
+      { path: 'grupos', component: GruposComponent }
       // Puedes agregar más rutas protegidas aquí
       // { path: 'profile', component: Profile },
       // { path: 'settings', component: Settings },

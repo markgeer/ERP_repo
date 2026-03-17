@@ -1,0 +1,167 @@
+<div class="grupos-container">
+  <p-toast></p-toast>
+  <p-confirmdialog></p-confirmdialog>
+
+  <p-card header="Gestión de Grupos">
+    <p-toolbar styleClass="mb-4">
+      <ng-template pTemplate="left">
+        <p-button 
+          label="Nuevo Grupo"
+          icon="pi pi-plus"
+          styleClass="p-button-primary"
+          (onClick)="abrirNuevo()"
+        ></p-button>
+      </ng-template>
+    </p-toolbar>
+
+    <p-table 
+      [value]="grupos" 
+      [paginator]="true" 
+      [rows]="5"
+      [rowsPerPageOptions]="[5,10,20]"
+      styleClass="p-datatable-striped"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Nivel</th>
+          <th>Autor</th>
+          <th>Nombre</th>
+          <th>Integrantes</th>
+          <th>Tickets</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-grupo>
+        <tr>
+          <td>{{ grupo.id }}</td>
+          <td>{{ grupo.nivel }}</td>
+          <td>{{ grupo.autor }}</td>
+          <td>{{ grupo.nombre }}</td>
+          <td>{{ grupo.integrantes }}</td>
+          <td>{{ grupo.tickets }}</td>
+          <td>{{ grupo.descripcion }}</td>
+          <td>
+            <p-button 
+              icon="pi pi-pencil"
+              styleClass="p-button-rounded p-button-text"
+              (onClick)="editarGrupo(grupo)"
+            ></p-button>
+            <p-button 
+              icon="pi pi-trash"
+              styleClass="p-button-rounded p-button-text p-button-danger"
+              (onClick)="eliminarGrupo(grupo)"
+            ></p-button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Dialog para crear/editar grupo -->
+  <p-dialog 
+    [(visible)]="grupoDialog" 
+    [style]="{width: '500px'}" 
+    header="{{ grupo.id ? 'Editar Grupo' : 'Nuevo Grupo' }}" 
+    [modal]="true"
+    (onHide)="ocultarDialog()"
+  >
+    <div class="p-fluid">
+      <div class="field">
+        <label for="nivel">Nivel *</label>
+        <!-- En tu grupos.html, reemplaza p-dropdown por: -->
+        <div class="field">
+        <label for="nivel">Nivel *</label>
+        <select 
+            id="nivel"
+            [(ngModel)]="grupo.nivel" 
+            class="p-inputtext" 
+            [class.ng-invalid]="submitted && !grupo.nivel"
+        >
+            <option *ngFor="let nivel of niveles" [value]="nivel.value">
+            {{ nivel.label }}
+            </option>
+        </select>
+        <small *ngIf="submitted && !grupo.nivel" class="p-error">
+            Nivel requerido
+        </small>
+        </div>
+        <small *ngIf="submitted && !grupo.nivel" class="p-error">Nivel requerido</small>
+      </div>
+
+      <div class="field">
+        <label for="autor">Autor *</label>
+        <input 
+          id="autor"
+          type="text" 
+          pInputText 
+          [(ngModel)]="grupo.autor"
+          [class.ng-invalid]="submitted && !grupo.autor"
+        />
+        <small *ngIf="submitted && !grupo.autor" class="p-error">Autor requerido</small>
+      </div>
+
+      <div class="field">
+        <label for="nombre">Nombre del Grupo *</label>
+        <input 
+          id="nombre"
+          type="text" 
+          pInputText 
+          [(ngModel)]="grupo.nombre"
+          [class.ng-invalid]="submitted && !grupo.nombre"
+        />
+        <small *ngIf="submitted && !grupo.nombre" class="p-error">Nombre requerido</small>
+      </div>
+
+      <div class="field">
+        <label for="integrantes">Número de Integrantes *</label>
+        <p-inputNumber 
+          id="integrantes"
+          [(ngModel)]="grupo.integrantes"
+          [showButtons]="true"
+          [min]="1"
+          [max]="100"
+          [class.ng-invalid]="submitted && !grupo.integrantes"
+        ></p-inputNumber>
+        <small *ngIf="submitted && !grupo.integrantes" class="p-error">Integrantes requeridos</small>
+      </div>
+
+      <div class="field">
+        <label for="tickets">Tickets</label>
+        <p-inputNumber 
+          id="tickets"
+          [(ngModel)]="grupo.tickets"
+          [showButtons]="true"
+          [min]="0"
+          [max]="grupo.integrantes"
+        ></p-inputNumber>
+      </div>
+
+      <div class="field">
+        <label for="descripcion">Descripción</label>
+        <textarea 
+          id="descripcion"
+          pInputTextarea 
+          [(ngModel)]="grupo.descripcion"
+          [rows]="3"
+        ></textarea>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Cancelar" 
+        icon="pi pi-times" 
+        (onClick)="ocultarDialog()"
+        styleClass="p-button-text"
+      ></p-button>
+      <p-button 
+        label="Guardar" 
+        icon="pi pi-check" 
+        (onClick)="guardarGrupo()"
+        [disabled]="submitted && !camposValidos()"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
+</div>
