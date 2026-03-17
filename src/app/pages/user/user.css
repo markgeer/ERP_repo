@@ -1,0 +1,55 @@
+.user-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #000000 0%, #1e0635 100%);
+  padding: 2rem;
+}
+
+.p-card {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(240, 248, 255, 0.088) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.field {
+  margin-bottom: 1.5rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: white;
+  font-weight: 500;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+input[readonly] {
+  opacity: 0.7;
+  cursor: default;
+}
+
+:host ::ng-deep .p-password,
+:host ::ng-deep .p-datepicker {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column;
+  }
+  
+  .actions .p-button {
+    width: 100%;
+  }
+}

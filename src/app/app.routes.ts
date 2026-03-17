@@ -6,6 +6,7 @@ import { Register } from './pages/register/register';
 import { Home } from './pages/home/home';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { GruposComponent } from './pages/grupos/grupos';
+import { UserComponent } from './pages/user/user';
 
 
 export const routes: Routes = [
@@ -21,7 +22,8 @@ export const routes: Routes = [
     component: MainLayout,
     children: [
       { path: 'home', component: Home },
-      { path: 'grupos', component: GruposComponent }
+      { path: 'grupos', component: GruposComponent },
+      {path: 'profile', component: UserComponent },
       // Puedes agregar más rutas protegidas aquí
       // { path: 'profile', component: Profile },
       // { path: 'settings', component: Settings },

@@ -1,0 +1,101 @@
+<div class="user-container">
+  <p-toast></p-toast>
+  
+  <p-card header="Mi Perfil">
+    <div class="p-fluid">
+      <!-- Usuario (solo lectura) -->
+      <div class="field">
+        <label>Usuario</label>
+        <input 
+          pInputText 
+          [value]="userData.username" 
+          readonly
+        />
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <label>Email</label>
+        <input 
+          pInputText 
+          [(ngModel)]="userData.email" 
+          [readonly]="!editando"
+        />
+      </div>
+
+      <!-- Contraseña (solo visible en edición) -->
+      <div class="field" *ngIf="editando">
+        <label>Nueva Contraseña</label>
+        <input 
+          type="password"
+          pInputText 
+          [(ngModel)]="userData.password"
+          placeholder="Dejar vacío para no cambiar"
+        />
+      </div>
+
+      <!-- Nombre Completo -->
+      <div class="field">
+        <label>Nombre Completo</label>
+        <input 
+          pInputText 
+          [(ngModel)]="userData.fullName" 
+          [readonly]="!editando"
+        />
+      </div>
+
+      <!-- Dirección -->
+      <div class="field">
+        <label>Dirección</label>
+        <input 
+          pInputText 
+          [(ngModel)]="userData.address" 
+          [readonly]="!editando"
+        />
+      </div>
+
+      <!-- Teléfono -->
+      <div class="field">
+        <label>Teléfono</label>
+        <input 
+          pInputText 
+          [(ngModel)]="userData.phone" 
+          [readonly]="!editando"
+          maxlength="10"
+        />
+      </div>
+
+      <!-- Botones de acción -->
+      <div class="actions">
+        <ng-container *ngIf="!editando; else editandoTemplate">
+          <p-button 
+            label="Editar" 
+            icon="pi pi-pencil"
+            (onClick)="editar()"
+          ></p-button>
+          <p-button 
+            label="Eliminar" 
+            icon="pi pi-trash"
+            styleClass="p-button-danger"
+            (onClick)="eliminar()"
+          ></p-button>
+        </ng-container>
+
+        <ng-template #editandoTemplate>
+          <p-button 
+            label="Guardar" 
+            icon="pi pi-check"
+            styleClass="p-button-success"
+            (onClick)="guardar()"
+          ></p-button>
+          <p-button 
+            label="Cancelar" 
+            icon="pi pi-times"
+            styleClass="p-button-secondary"
+            (onClick)="cancelar()"
+          ></p-button>
+        </ng-template>
+      </div>
+    </div>
+  </p-card>
+</div>
