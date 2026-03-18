@@ -1,54 +1,87 @@
 .user-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
   padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.p-card {
-  width: 100%;
-  max-width: 500px;
-  background: rgba(240, 248, 255, 0.088) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
+.profile-header {
+  margin-bottom: 2rem;
 }
 
-.field {
-  margin-bottom: 1.5rem;
+.profile-header h1 {
+  margin: 0;
+  color: #333;
+  font-size: 2rem;
 }
 
-.field label {
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.profile-main {
+  grid-row: span 2; /* Ocupa 2 filas */
+}
+
+.profile-card {
+  border: 1px solid #e0e0e065 !important;
+  margin-bottom: 0;
+}
+
+.profile-card h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.avatar-section {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.avatar-info p {
+  margin: 0.25rem 0;
+  color: #ffffff;
+}
+
+
+.password-section {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1rem;
+}
+
+.password-section label {
   display: block;
   margin-bottom: 0.5rem;
-  color: white;
+  color: #666;
   font-weight: 500;
+}
+
+.password-display {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e0e0e076;
+  justify-content: space-between;
+  background: #000000;
+}
+
+
+.info-field input {
+  width: 100%;
 }
 
 .actions {
   display: flex;
   gap: 1rem;
-  justify-content: center;
-  margin-top: 2rem;
+  justify-content: flex-end;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 2rem;
 }
 
 input[readonly] {
-  opacity: 0.7;
+  background-color: #000000;
   cursor: default;
-}
-
-:host ::ng-deep .p-password,
-:host ::ng-deep .p-datepicker {
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .actions {
-    flex-direction: column;
-  }
-  
-  .actions .p-button {
-    width: 100%;
-  }
 }

@@ -14,3 +14,7 @@ app-root {
   width: 100%;
   background-color: #ffffff;
 }
+
+:root{
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}

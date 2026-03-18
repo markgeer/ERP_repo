@@ -59,8 +59,14 @@
 
 .sidebar-footer {
   padding: 1rem;
-  border-top: 1px solid #ffffff;
   color: rgb(57, 57, 57);
-  
+  display: flex;
 }
 
+.version-info {
+  padding: 1rem;
+  border-top: 1px solid #ffffff;
+  color: rgb(57, 57, 57);
+  height: 50px;
+  display: flex;
+}

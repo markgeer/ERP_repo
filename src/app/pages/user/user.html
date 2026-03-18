@@ -1,20 +1,70 @@
 <div class="user-container">
   <p-toast></p-toast>
   
-  <p-card header="Mi Perfil">
-    <div class="p-fluid">
-      <!-- Usuario (solo lectura) -->
-      <div class="field">
-        <label>Usuario</label>
-        <input 
-          pInputText 
-          [value]="userData.username" 
-          readonly
-        />
-      </div>
+  <div class="profile-header">
+    <h1>Mi Perfil</h1>
+  </div>
 
-      <!-- Email -->
-      <div class="field">
+  <div class="profile-grid">
+    <!-- BLOQUE 1: Foto y datos básicos (izquierda) -->
+    <p-card class="profile-card profile-main">
+      <div class="avatar-section">
+        <p-avatar 
+          icon="pi pi-user" 
+          shape="circle" 
+          size="xlarge"
+        ></p-avatar>
+        <div class="avatar-info">
+          <h3>{{ userData.fullName }}</h3>
+          <p>{{ userData.username }}</p>
+          <p class="last-login">
+            <i class="pi pi-clock"></i> 
+            Último acceso: {{ lastLogin | date:'dd/MM/yyyy HH:mm' }}
+          </p>
+        </div>
+      </div>
+      
+      <div class="password-section">
+        <label>Contraseña</label>
+        <div class="password-display">
+          <span>••••••••</span>
+          <p-button 
+            label="Cambiar"
+            icon="pi pi-pencil"
+            styleClass="p-button-text p-button-sm"
+            (onClick)="cambiandoPassword = !cambiandoPassword"
+          ></p-button>
+        </div>
+        
+        <div class="password-change" *ngIf="cambiandoPassword">
+          <input 
+            type="password" 
+            pInputText 
+            [(ngModel)]="newPassword" 
+            placeholder="Nueva contraseña"
+          />
+          <input 
+            type="password" 
+            pInputText 
+            [(ngModel)]="confirmNewPassword" 
+            placeholder="Confirmar"
+          />
+          <div class="password-actions">
+            <p-button 
+              label="Guardar"
+              icon="pi pi-check"
+              styleClass="p-button-sm"
+              (onClick)="cambiandoPassword = false"
+            ></p-button>
+          </div>
+        </div>
+      </div>
+    </p-card>
+
+    <!-- BLOQUE 2: Contacto (derecha arriba) -->
+    <p-card class="profile-card">
+      <h3>Contacto</h3>
+      <div class="info-field">
         <label>Email</label>
         <input 
           pInputText 
@@ -22,40 +72,7 @@
           [readonly]="!editando"
         />
       </div>
-
-      <!-- Contraseña (solo visible en edición) -->
-      <div class="field" *ngIf="editando">
-        <label>Nueva Contraseña</label>
-        <input 
-          type="password"
-          pInputText 
-          [(ngModel)]="userData.password"
-          placeholder="Dejar vacío para no cambiar"
-        />
-      </div>
-
-      <!-- Nombre Completo -->
-      <div class="field">
-        <label>Nombre Completo</label>
-        <input 
-          pInputText 
-          [(ngModel)]="userData.fullName" 
-          [readonly]="!editando"
-        />
-      </div>
-
-      <!-- Dirección -->
-      <div class="field">
-        <label>Dirección</label>
-        <input 
-          pInputText 
-          [(ngModel)]="userData.address" 
-          [readonly]="!editando"
-        />
-      </div>
-
-      <!-- Teléfono -->
-      <div class="field">
+      <div class="info-field">
         <label>Teléfono</label>
         <input 
           pInputText 
@@ -64,38 +81,67 @@
           maxlength="10"
         />
       </div>
+    </p-card>
 
-      <!-- Botones de acción -->
-      <div class="actions">
-        <ng-container *ngIf="!editando; else editandoTemplate">
-          <p-button 
-            label="Editar" 
-            icon="pi pi-pencil"
-            (onClick)="editar()"
-          ></p-button>
-          <p-button 
-            label="Eliminar" 
-            icon="pi pi-trash"
-            styleClass="p-button-danger"
-            (onClick)="eliminar()"
-          ></p-button>
-        </ng-container>
-
-        <ng-template #editandoTemplate>
-          <p-button 
-            label="Guardar" 
-            icon="pi pi-check"
-            styleClass="p-button-success"
-            (onClick)="guardar()"
-          ></p-button>
-          <p-button 
-            label="Cancelar" 
-            icon="pi pi-times"
-            styleClass="p-button-secondary"
-            (onClick)="cancelar()"
-          ></p-button>
-        </ng-template>
+    <!-- BLOQUE 3: Info personal (derecha abajo) -->
+    <p-card class="profile-card">
+      <h3>Información personal</h3>
+      <div class="info-field">
+        <label>Nombre completo</label>
+        <input 
+          pInputText 
+          [(ngModel)]="userData.fullName" 
+          [readonly]="!editando"
+        />
       </div>
-    </div>
-  </p-card>
+      <div class="info-field">
+        <label>Dirección</label>
+        <input 
+          pInputText 
+          [(ngModel)]="userData.address" 
+          [readonly]="!editando"
+        />
+      </div>
+      <div class="info-field">
+        <label>Fecha nacimiento</label>
+        <input 
+          pInputText 
+          [value]="userData.birthDate | date:'dd/MM/yyyy'"
+          [readonly]="!editando"
+        />
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Botones de acción -->
+  <div class="actions">
+    <ng-container *ngIf="!editando; else editandoTemplate">
+      <p-button 
+        label="Editar" 
+        icon="pi pi-pencil"
+        (onClick)="editar()"
+      ></p-button>
+      <p-button 
+        label="Eliminar" 
+        icon="pi pi-trash"
+        styleClass="p-button-danger"
+        (onClick)="eliminar()"
+      ></p-button>
+    </ng-container>
+
+    <ng-template #editandoTemplate>
+      <p-button 
+        label="Guardar" 
+        icon="pi pi-check"
+        styleClass="p-button-success"
+        (onClick)="guardar()"
+      ></p-button>
+      <p-button 
+        label="Cancelar" 
+        icon="pi pi-times"
+        styleClass="p-button-secondary"
+        (onClick)="cancelar()"
+      ></p-button>
+    </ng-template>
+  </div>
 </div>

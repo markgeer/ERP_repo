@@ -27,11 +27,11 @@ export class Sidebar {
         icon: 'pi pi-home',
         routerLink: ['/home']
       },
-      {
-        label: 'tickets',
-        icon: 'pi pi-user',
-        routerLink: ['/profile']
-      },
+      // {
+      //   label: 'tickets',
+      //   icon: 'pi pi-user',
+      //   routerLink: ['/profile']
+      // },
       {
         label: 'Grupos',
         icon: 'pi pi-cog',
