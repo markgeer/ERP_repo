@@ -36,15 +36,15 @@ export class Sidebar implements OnInit { // Cambiar a implements OnInit
 
     // Dashboard - siempre visible
     menuItems.push({
-      label: 'Dashboard',
+      label: 'Grupos',
       icon: 'pi pi-home',
-      routerLink: ['/home']
+      routerLink: ['/grupos-dashboard']
     });
 
     // Grupos - solo si tiene permiso groups-view
     if (this.permissionsSvc.hasAnyPermission(['groups-view'])) {
       menuItems.push({
-        label: 'Grupos',
+        label: 'Gestion de Grupos',
         icon: 'pi pi-users',
         routerLink: ['/grupos']
       });

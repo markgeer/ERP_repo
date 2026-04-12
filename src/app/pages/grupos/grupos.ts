@@ -139,4 +139,14 @@ export class GruposComponent implements OnInit {
     this.grupoDialog = false;
     this.submitted = false;
   }
+
+  // Agrega estas propiedades al final del componente
+  get totalTickets(): number {
+    return this.grupos.reduce((sum, g) => sum + (g.tickets || 0), 0);
+  }
+
+  get totalMiembros(): number {
+    return this.grupos.reduce((sum, g) => sum + (g.integrantes || 0), 0);
+  }
+
 }

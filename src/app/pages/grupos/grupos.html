@@ -2,19 +2,48 @@
   <p-toast></p-toast>
   <p-confirmdialog></p-confirmdialog>
 
-  <p-card header="Gestión de Grupos">
-    <p-toolbar styleClass="mb-4">
-      <ng-template pTemplate="left">
-        <p-button 
-          *ifHasPermission="'groups-add'"
-          label="Nuevo Grupo"
-          icon="pi pi-plus"
-          styleClass="p-button-primary"
-          (onClick)="abrirNuevo()"
-        ></p-button>
-      </ng-template>
-    </p-toolbar>
+  <!-- Encabezado -->
+  <div class="page-header">
+    <div>
+      <h1>Gestión de Grupos</h1>
+      <p class="subtitle">Administra los grupos de trabajo y sus miembros</p>
+    </div>
+    <p-button 
+      *ifHasPermission="'groups-add'"
+      label="Nuevo Grupo"
+      icon="pi pi-plus"
+      styleClass="p-button-primary"
+      (onClick)="abrirNuevo()"
+    ></p-button>
+  </div>
 
+  <!-- Tarjetas de resumen (nuevo) -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <i class="pi pi-users"></i>
+      <div>
+        <span class="stat-value">{{ grupos.length }}</span>
+        <span class="stat-label">Total Grupos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="pi pi-ticket"></i>
+      <div>
+        <span class="stat-value">{{ totalTickets }}</span>
+        <span class="stat-label">Total Tickets</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="pi pi-user-plus"></i>
+      <div>
+        <span class="stat-value">{{ totalMiembros }}</span>
+        <span class="stat-label">Miembros</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla de grupos -->
+  <p-card>
     <p-table 
       [value]="grupos" 
       [paginator]="true" 
@@ -44,18 +73,20 @@
           <td>{{ grupo.tickets }}</td>
           <td>{{ grupo.descripcion }}</td>
           <td>
-            <p-button 
-              *ifHasPermission="'groups-edit'"
-              icon="pi pi-pencil"
-              styleClass="p-button-rounded p-button-text"
-              (onClick)="editarGrupo(grupo)"
-            ></p-button>
-            <p-button 
-              *ifHasPermission="'groups-delete'"
-              icon="pi pi-trash"
-              styleClass="p-button-rounded p-button-text p-button-danger"
-              (onClick)="eliminarGrupo(grupo)"
-            ></p-button>
+            <div class="acciones">
+              <p-button 
+                *ifHasPermission="'groups-edit'"
+                icon="pi pi-pencil"
+                styleClass="p-button-rounded p-button-text p-button-sm"
+                (onClick)="editarGrupo(grupo)"
+              >✎</p-button>
+              <p-button 
+                *ifHasPermission="'groups-delete'"
+                icon="pi pi-trash"
+                styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                (onClick)="eliminarGrupo(grupo)"
+              >🗑</p-button>
+            </div>
           </td>
         </tr>
       </ng-template>
@@ -72,10 +103,7 @@
   >
     <div class="p-fluid">
       <div class="field">
-        <label for="nivel">Nivel *</label>
-        <!-- En tu grupos.html, reemplaza p-dropdown por: -->
-        <div class="field">
-        <label for="nivel">Nivel *</label>
+        <label for="nivel">Nivel</label>
         <select 
             id="nivel"
             [(ngModel)]="grupo.nivel" 
@@ -83,18 +111,14 @@
             [class.ng-invalid]="submitted && !grupo.nivel"
         >
             <option *ngFor="let nivel of niveles" [value]="nivel.value">
-            {{ nivel.label }}
+              {{ nivel.label }}
             </option>
         </select>
-        <small *ngIf="submitted && !grupo.nivel" class="p-error">
-            Nivel requerido
-        </small>
-        </div>
         <small *ngIf="submitted && !grupo.nivel" class="p-error">Nivel requerido</small>
       </div>
 
       <div class="field">
-        <label for="autor">Autor *</label>
+        <label for="autor">Autor</label>
         <input 
           id="autor"
           type="text" 
@@ -106,7 +130,7 @@
       </div>
 
       <div class="field">
-        <label for="nombre">Nombre del Grupo *</label>
+        <label for="nombre">Nombre del Grupo</label>
         <input 
           id="nombre"
           type="text" 
@@ -118,7 +142,7 @@
       </div>
 
       <div class="field">
-        <label for="integrantes">Número de Integrantes *</label>
+        <label for="integrantes">Número de Integrantes</label>
         <p-inputNumber 
           id="integrantes"
           [(ngModel)]="grupo.integrantes"

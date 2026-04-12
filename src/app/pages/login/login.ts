@@ -58,7 +58,7 @@ export class Login {
         ]);
         
         alert('¡Login exitoso! Bienvenido al sistema');
-        this.router.navigate(['/home']);
+        this.router.navigate(['/grupos-dashboard']);
         
       } else if (this.loginData.username === 'editor' && this.loginData.password === 'Editor123!') {
       // Editor con permisos limitados - SOLO puede ver grupos
@@ -68,7 +68,7 @@ export class Login {
       ]);
         
         alert('¡Login exitoso! Bienvenido editor');
-        this.router.navigate(['/home']);
+        this.router.navigate(['/grupos-dashboard']);
         
       } else {
         alert('Credenciales incorrectas. Usuario: admin, Contraseña: Admin123!');
