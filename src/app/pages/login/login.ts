@@ -5,8 +5,9 @@ import { Button } from "primeng/button";
 import { Password } from "primeng/password";
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { Message } from "primeng/message";
+// import { Message } from "primeng/message";
 import { Router } from '@angular/router';
+import { PermissionsService } from '../../services/permissions.service'; // Agregar
 
 @Component({
   selector: 'app-login',
@@ -17,47 +18,56 @@ import { Router } from '@angular/router';
     Password, 
     FormsModule, 
     NgIf,
-    Message
+    // Message
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
 export class Login {
-  // Objeto para almacenar los datos del formulario
   loginData = {
     username: '',
     password: ''
   };
 
-  // Variable para controlar el envío del formulario
   submitted = false;
-
-  // Credenciales hardcodeadas (usuario y contraseña fijos)
   private readonly VALID_USERNAME = 'admin';
   private readonly VALID_PASSWORD = 'Admin123!';
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private permissionsSvc: PermissionsService  // Agregar
+  ) {}
 
-  // Método para validar el formulario
   validateForm(): boolean {
     return this.loginData.username.trim() !== '' && 
            this.loginData.password.trim() !== '';
   }
 
-  // Método para manejar el envío del formulario
   onSubmit() {
     this.submitted = true;
 
     if (this.validateForm()) {
-      // Validación de credenciales hardcodeadas
       if (this.loginData.username === this.VALID_USERNAME && 
           this.loginData.password === this.VALID_PASSWORD) {
         
-        console.log('Login exitoso');
-        // Mostrar mensaje de éxito
-        alert('¡Login exitoso! Bienvenido al sistema');
+        // Admin con todos los permisos
+        this.permissionsSvc.setPermissions([
+          'groups-view', 'groups-add', 'groups-edit', 'groups-delete',
+          'users-view', 'users-add', 'users-edit', 'users-delete',
+          'tickets-view', 'tickets-add', 'tickets-edit', 'tickets-delete'
+        ]);
         
-        // Redireccionar al dashboard o página principal
+        alert('¡Login exitoso! Bienvenido al sistema');
+        this.router.navigate(['/home']);
+        
+      } else if (this.loginData.username === 'editor' && this.loginData.password === 'Editor123!') {
+      // Editor con permisos limitados - SOLO puede ver grupos
+      this.permissionsSvc.setPermissions([
+        'groups-view'
+        // NO incluir 'users-view', 'tickets-view', etc.
+      ]);
+        
+        alert('¡Login exitoso! Bienvenido editor');
         this.router.navigate(['/home']);
         
       } else {
@@ -66,10 +76,8 @@ export class Login {
     }
   }
 
-  // Método para verificar si un campo es inválido
   isFieldInvalid(fieldName: string): boolean {
     if (!this.submitted) return false;
-
     switch(fieldName) {
       case 'username':
         return this.loginData.username.trim() === '';
@@ -80,10 +88,8 @@ export class Login {
     }
   }
 
-  // Método para obtener el mensaje de error
   getErrorMessage(fieldName: string): string {
     if (!this.submitted) return '';
-
     switch(fieldName) {
       case 'username':
         return 'El usuario es requerido';

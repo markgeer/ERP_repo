@@ -32,29 +32,36 @@
             label="Cambiar"
             icon="pi pi-pencil"
             styleClass="p-button-text p-button-sm"
-            (onClick)="cambiandoPassword = !cambiandoPassword"
+            [disabled]="!editando"
+            (onClick)="cambiandoPassword = true"
           ></p-button>
         </div>
         
         <div class="password-change" *ngIf="cambiandoPassword">
-          <input 
-            type="password" 
-            pInputText 
-            [(ngModel)]="newPassword" 
-            placeholder="Nueva contraseña"
-          />
-          <input 
-            type="password" 
-            pInputText 
-            [(ngModel)]="confirmNewPassword" 
-            placeholder="Confirmar"
-          />
+          <p-password 
+            [(ngModel)]="newPassword"
+            [toggleMask]="true"
+            [feedback]="true"
+            placeholder="Mínimo 10 caracteres con símbolos"
+          ></p-password>
+          <p-password 
+            [(ngModel)]="confirmNewPassword"
+            [toggleMask]="true"
+            [feedback]="false"
+            placeholder="Confirmar contraseña"
+          ></p-password>
           <div class="password-actions">
             <p-button 
               label="Guardar"
               icon="pi pi-check"
-              styleClass="p-button-sm"
-              (onClick)="cambiandoPassword = false"
+              (onClick)="guardarPassword()"
+              [disabled]="!passwordValida()"
+            ></p-button>
+            <p-button 
+              label="Cancelar"
+              icon="pi pi-times"
+              styleClass="p-button-text"
+              (onClick)="cancelarCambioPassword()"
             ></p-button>
           </div>
         </div>

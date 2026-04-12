@@ -1,0 +1,51 @@
+<div class="ticket-create-container">
+  <p-toast></p-toast>
+  
+  <p-card header="Crear Nuevo Ticket">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="titulo">Título *</label>
+        <input id="titulo" type="text" pInputText [(ngModel)]="ticket.titulo" />
+      </div>
+
+      <div class="field">
+        <label for="descripcion">Descripción</label>
+        <textarea 
+          id="descripcion" 
+          rows="5" 
+          pTextarea 
+          [(ngModel)]="ticket.descripcion">
+        </textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="estado">Estado</label>
+          <p-select id="estado" [options]="estados" [(ngModel)]="ticket.estado" optionLabel="label"></p-select>
+        </div>
+
+        <div class="field">
+          <label for="prioridad">Prioridad</label>
+          <p-select id="prioridad" [options]="prioridades" [(ngModel)]="ticket.prioridad" optionLabel="label"></p-select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label for="asignadoA">Asignar a</label>
+          <p-select id="asignadoA" [options]="usuarios" [(ngModel)]="ticket.asignadoA" optionLabel="label" placeholder="Seleccionar usuario"></p-select>
+        </div>
+
+        <div class="field">
+          <label for="fechaLimite">Fecha límite</label>
+          <p-datepicker id="fechaLimite" [(ngModel)]="ticket.fechaLimite" dateFormat="dd/mm/yy" [showIcon]="true"></p-datepicker>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-secondary" (onClick)="cancelar()"></p-button>
+        <p-button label="Crear Ticket" icon="pi pi-check" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
+      </div>
+    </div>
+  </p-card>
+</div>

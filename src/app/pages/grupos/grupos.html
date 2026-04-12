@@ -6,6 +6,7 @@
     <p-toolbar styleClass="mb-4">
       <ng-template pTemplate="left">
         <p-button 
+          *ifHasPermission="'groups-add'"
           label="Nuevo Grupo"
           icon="pi pi-plus"
           styleClass="p-button-primary"
@@ -44,11 +45,13 @@
           <td>{{ grupo.descripcion }}</td>
           <td>
             <p-button 
+              *ifHasPermission="'groups-edit'"
               icon="pi pi-pencil"
               styleClass="p-button-rounded p-button-text"
               (onClick)="editarGrupo(grupo)"
             ></p-button>
             <p-button 
+              *ifHasPermission="'groups-delete'"
               icon="pi pi-trash"
               styleClass="p-button-rounded p-button-text p-button-danger"
               (onClick)="eliminarGrupo(grupo)"

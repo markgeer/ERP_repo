@@ -1,0 +1,106 @@
+<div class="ticket-list-container">
+  <div class="list-header">
+    <div>
+      <h1>Lista de Tickets</h1>
+      <p class="subtitle">Visualiza y gestiona todos los tickets</p>
+    </div>
+    <div class="header-actions">
+      <p-button label="Tablero Kanban" icon="pi pi-table" styleClass="p-button-secondary" (onClick)="irAKanban()"></p-button>
+      <p-button label="Dashboard" icon="pi pi-home" styleClass="p-button-secondary" (onClick)="irAGroupDashboard()"></p-button>
+      <p-button label="Nuevo Ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
+    </div>
+  </div>
+
+  <p-card>
+    <!-- Filtros -->
+    <div class="filtros-section">
+      <div class="filtros-grid">
+        <div class="field">
+          <label>Estado</label>
+          <p-select [options]="estados" [(ngModel)]="filtroEstado" (onChange)="aplicarFiltros()"></p-select>
+        </div>
+        
+        <div class="field">
+          <label>Prioridad</label>
+          <p-select [options]="prioridades" [(ngModel)]="filtroPrioridad" (onChange)="aplicarFiltros()"></p-select>
+        </div>
+        
+        <div class="field">
+          <label>Asignado a</label>
+          <p-select [options]="usuarios" [(ngModel)]="filtroAsignado" (onChange)="aplicarFiltros()"></p-select>
+        </div>
+        
+        <div class="field">
+          <label>Buscar</label>
+          <input pInputText [(ngModel)]="busqueda" placeholder="Título o descripción..." (input)="aplicarFiltros()" />
+        </div>
+        
+        <div class="field filter-actions">
+          <p-button label="Limpiar filtros" icon="pi pi-filter-slash" styleClass="p-button-text" (onClick)="limpiarFiltros()"></p-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de tickets -->
+    <p-table 
+      [value]="ticketsFiltrados" 
+      [paginator]="true" 
+      [rows]="10"
+      [rowsPerPageOptions]="[5,10,20,50]"
+      styleClass="p-datatable-striped"
+      [globalFilterFields]="['titulo', 'descripcion']"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>Asignado a</th>
+          <th>Creado por</th>
+          <th>Fecha creación</th>
+          <th>Fecha límite</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-ticket>
+        <tr>
+          <td>{{ ticket.id }}</td>
+          <td>
+            <a class="ticket-link" (click)="verTicket(ticket.id)">{{ ticket.titulo }}</a>
+          </td>
+          <td><p-tag [value]="ticket.estado" [severity]="getEstadoSeverity(ticket.estado)"></p-tag></td>
+          <td><p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)"></p-tag></td>
+          <td>{{ ticket.asignadoA || 'Sin asignar' }}</td>
+          <td>{{ ticket.creadoPor }}</td>
+          <td>{{ ticket.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+          <td>{{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8" class="text-center">No hay tickets disponibles</td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <!-- Resumen -->
+    <div class="resumen-section">
+      <div class="resumen-item">
+        <span class="resumen-label">Total tickets:</span>
+        <span class="resumen-value">{{ ticketsFiltrados.length }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Pendientes:</span>
+        <span class="resumen-value">{{ getTicketsPorEstado('Pendiente') }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">En progreso:</span>
+        <span class="resumen-value">{{ getTicketsPorEstado('En Progreso') }}</span>
+      </div>
+      <div class="resumen-item">
+        <span class="resumen-label">Completados:</span>
+        <span class="resumen-value">{{ getTicketsPorEstado('Hecho') }}</span>
+      </div>
+    </div>
+  </p-card>
+</div>

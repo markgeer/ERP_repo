@@ -7,7 +7,14 @@ import { Home } from './pages/home/home';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { GruposComponent } from './pages/grupos/grupos';
 import { UserComponent } from './pages/user/user';
-
+import { GruposDashboardComponent } from './pages/grupos-dashboard/grupos-dashboard';
+import { GroupDashboardComponent } from './pages/group-dashboard/group-dashboard';
+import { KanbanComponent } from './pages/kanban/kanban';
+import { TicketCreateComponent } from './pages/ticket/ticket-create/ticket-create';
+import { TicketDetailComponent } from './pages/ticket/ticket-detail/ticket-detail';
+import { TicketListComponent } from './pages/ticket/ticket-list/ticket-list';
+import { GroupManagementComponent } from './pages/group-management/group-management';
+import { UserManagementComponent } from './pages/user-management/user-management';
 
 export const routes: Routes = [
   // Rutas públicas (sin layout)
@@ -23,10 +30,15 @@ export const routes: Routes = [
     children: [
       { path: 'home', component: Home },
       { path: 'grupos', component: GruposComponent },
-      {path: 'profile', component: UserComponent },
-      // Puedes agregar más rutas protegidas aquí
-      // { path: 'profile', component: Profile },
-      // { path: 'settings', component: Settings },
+      { path: 'profile', component: UserComponent },
+      { path: 'grupos-dashboard', component: GruposDashboardComponent },
+      { path: 'group-dashboard', component: GroupDashboardComponent },
+      { path: 'kanban', component: KanbanComponent },
+      { path: 'tickets', component: TicketListComponent },
+      { path: 'ticket/:id', component: TicketDetailComponent },
+      { path: 'ticket-create', component: TicketCreateComponent },
+      { path: 'group-management', component: GroupManagementComponent },
+      { path: 'user-management', component: UserManagementComponent }
     ]
   },
   

@@ -3,70 +3,77 @@
   left: 0;
   top: 0;
   height: 100vh;
-  width: 285px; /* Mantén este valor en mente */
-  background: linear-gradient(180deg, #171717); /* Corregido */
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  width: 260px;
+  background: #1e1e2f;
   display: flex;
   flex-direction: column;
   z-index: 1000;
 }
 
-.sidebar-header {
-  color:#d9d9d9;
-  padding: 1.5rem;
-  border-bottom: 1px solid #ffffff;
-}
-
 .sidebar-header h2 {
   margin: 0;
-  font-size: 1.5rem;
+  padding: 1.5rem;
+  color: #fff;
+  font-size: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .user-info {
   padding: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 1rem;
-  border-bottom: 1px solid #ffffff;
-}
-
-.user-details {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .user-name {
-  color: #d9d9d9;
-  font-weight: 600;
-  font-size: 1rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #fff;
+  font-weight: 500;
 }
 
 .user-email {
-  color: #d9d9d9;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
 }
 
 .sidebar-menu {
   flex: 1;
-  padding: 1rem 0;
+  padding: 1rem;
 }
 
 .sidebar-footer {
   padding: 1rem;
-  color: rgb(57, 57, 57);
-  display: flex;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .version-info {
-  padding: 1rem;
-  border-top: 1px solid #ffffff;
-  color: rgb(57, 57, 57);
-  height: 50px;
-  display: flex;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.7rem;
+}
+
+/* Estilos para el menú de PrimeNG dentro del sidebar */
+::ng-deep .custom-menu {
+  background: transparent !important;
+  border: none !important;
+}
+
+::ng-deep .custom-menu .p-menuitem-link {
+  color: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 8px !important;
+  margin-bottom: 4px !important;
+}
+
+::ng-deep .custom-menu .p-menuitem-link:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+::ng-deep .custom-menu .p-menuitem-link .p-menuitem-icon {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+::ng-deep .custom-menu .p-menuitem-link:hover .p-menuitem-icon {
+  color: #fff !important;
 }

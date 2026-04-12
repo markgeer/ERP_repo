@@ -1,0 +1,135 @@
+<div class="kanban-container">
+  <div class="kanban-header">
+    <div>
+      <h1>Tablero Kanban</h1>
+      <p>Arrastra tickets entre columnas para cambiar su estado</p>
+    </div>
+    <div class="header-actions">
+      <p-button label="Dashboard" icon="pi pi-home" styleClass="p-button-secondary" (onClick)="volverDashboard()"></p-button>
+      <p-button label="Lista de Tickets" icon="pi pi-list" styleClass="p-button-secondary" (onClick)="irALista()"></p-button>
+      <p-button label="Nuevo Ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
+    </div>
+  </div>
+
+  <div cdkDropListGroup class="kanban-board">
+    <!-- Columna Pendiente -->
+    <div class="kanban-column">
+      <div class="column-header pending">
+        <h2>📋 Pendiente</h2>
+        <span class="badge">{{ ticketsPendientes.length }}</span>
+      </div>
+      <div
+        cdkDropList
+        id="pendiente"
+        [cdkDropListData]="ticketsPendientes"
+        class="ticket-list"
+        (cdkDropListDropped)="onDrop($event)">
+        
+        <div *ngFor="let ticket of ticketsPendientes" cdkDrag class="ticket-card" (click)="verTicket(ticket.id)">
+          <div class="ticket-title">{{ ticket.titulo }}</div>
+          <div class="ticket-info">
+            <p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)" size="small"></p-tag>
+            <span class="ticket-assignee"><i class="pi pi-user"></i> {{ ticket.asignadoA || 'Sin asignar' }}</span>
+          </div>
+          <div class="ticket-footer">
+            <span class="ticket-date"><i class="pi pi-calendar"></i> {{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        
+        <div *ngIf="ticketsPendientes.length === 0" class="empty-column">
+          No hay tickets pendientes
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna En Progreso -->
+    <div class="kanban-column">
+      <div class="column-header progress">
+        <h2>⚙️ En Progreso</h2>
+        <span class="badge">{{ ticketsProgreso.length }}</span>
+      </div>
+      <div
+        cdkDropList
+        id="progreso"
+        [cdkDropListData]="ticketsProgreso"
+        class="ticket-list"
+        (cdkDropListDropped)="onDrop($event)">
+        
+        <div *ngFor="let ticket of ticketsProgreso" cdkDrag class="ticket-card" (click)="verTicket(ticket.id)">
+          <div class="ticket-title">{{ ticket.titulo }}</div>
+          <div class="ticket-info">
+            <p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)" size="small"></p-tag>
+            <span class="ticket-assignee"><i class="pi pi-user"></i> {{ ticket.asignadoA || 'Sin asignar' }}</span>
+          </div>
+          <div class="ticket-footer">
+            <span class="ticket-date"><i class="pi pi-calendar"></i> {{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        
+        <div *ngIf="ticketsProgreso.length === 0" class="empty-column">
+          No hay tickets en progreso
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Revisión -->
+    <div class="kanban-column">
+      <div class="column-header review">
+        <h2>🔍 Revisión</h2>
+        <span class="badge">{{ ticketsRevision.length }}</span>
+      </div>
+      <div
+        cdkDropList
+        id="revision"
+        [cdkDropListData]="ticketsRevision"
+        class="ticket-list"
+        (cdkDropListDropped)="onDrop($event)">
+        
+        <div *ngFor="let ticket of ticketsRevision" cdkDrag class="ticket-card" (click)="verTicket(ticket.id)">
+          <div class="ticket-title">{{ ticket.titulo }}</div>
+          <div class="ticket-info">
+            <p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)" size="small"></p-tag>
+            <span class="ticket-assignee"><i class="pi pi-user"></i> {{ ticket.asignadoA || 'Sin asignar' }}</span>
+          </div>
+          <div class="ticket-footer">
+            <span class="ticket-date"><i class="pi pi-calendar"></i> {{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        
+        <div *ngIf="ticketsRevision.length === 0" class="empty-column">
+          No hay tickets en revisión
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Hecho -->
+    <div class="kanban-column">
+      <div class="column-header done">
+        <h2>✅ Hecho</h2>
+        <span class="badge">{{ ticketsHecho.length }}</span>
+      </div>
+      <div
+        cdkDropList
+        id="hecho"
+        [cdkDropListData]="ticketsHecho"
+        class="ticket-list"
+        (cdkDropListDropped)="onDrop($event)">
+        
+        <div *ngFor="let ticket of ticketsHecho" cdkDrag class="ticket-card" (click)="verTicket(ticket.id)">
+          <div class="ticket-title">{{ ticket.titulo }}</div>
+          <div class="ticket-info">
+            <p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)" size="small"></p-tag>
+            <span class="ticket-assignee"><i class="pi pi-user"></i> {{ ticket.asignadoA || 'Sin asignar' }}</span>
+          </div>
+          <div class="ticket-footer">
+            <span class="ticket-date"><i class="pi pi-calendar"></i> {{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        
+        <div *ngIf="ticketsHecho.length === 0" class="empty-column">
+          No hay tickets completados
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

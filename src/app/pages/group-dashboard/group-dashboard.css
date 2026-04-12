@@ -1,0 +1,180 @@
+.group-dashboard {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.dashboard-header h1 {
+  margin: 0;
+  color: #212529;
+  font-size: 1.8rem;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: #6c757d;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Métricas */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.metric-card {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.metric-card:hover {
+  transform: translateY(-3px);
+}
+
+.metric-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+
+.metric-icon {
+  font-size: 2.5rem;
+  color: #667eea;
+}
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.metric-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #212529;
+}
+
+.metric-label {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Asistente IA */
+.llm-card {
+  margin-bottom: 2rem;
+}
+
+.llm-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.llm-header i {
+  font-size: 1.5rem;
+  color: #667eea;
+}
+
+.llm-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.llm-messages {
+  height: 200px;
+  overflow-y: auto;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.message {
+  margin-bottom: 0.75rem;
+}
+
+.message-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  max-width: 80%;
+}
+
+.user-message .message-bubble {
+  background: #667eea;
+  color: white;
+  float: right;
+}
+
+.message:not(.user-message) .message-bubble {
+  background: white;
+  border: 1px solid #e9ecef;
+}
+
+.llm-input {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.llm-input input {
+  flex: 1;
+}
+
+/* Tickets recientes */
+.ticket-link {
+  color: #667eea;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.ticket-link:hover {
+  text-decoration: underline;
+}
+
+.recent-tickets {
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .group-dashboard {
+    padding: 1rem;
+  }
+  
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .header-actions .p-button {
+    width: 100%;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+}

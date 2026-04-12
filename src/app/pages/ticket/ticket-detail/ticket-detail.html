@@ -1,0 +1,131 @@
+<div class="ticket-detail-container" *ngIf="ticket">
+  <p-toast></p-toast>
+  
+  <div class="detail-header">
+    <p-button label="Volver" icon="pi pi-arrow-left" styleClass="p-button-text" (onClick)="volver()"></p-button>
+    <h1>Ticket #{{ ticket.id }}: {{ ticket.titulo }}</h1>
+  </div>
+
+  <div class="detail-grid">
+    <!-- Información principal -->
+    <p-card class="info-card">
+      <div class="card-header">
+        <h2>Información del Ticket</h2>
+        <p-button 
+          *ngIf="puedeEditar() && !editando" 
+          label="Editar" 
+          icon="pi pi-pencil" 
+          styleClass="p-button-text" 
+          (onClick)="editando = true">
+        </p-button>
+        <p-button 
+          *ngIf="editando" 
+          label="Guardar" 
+          icon="pi pi-save" 
+          styleClass="p-button-success" 
+          (onClick)="guardarCambios()">
+        </p-button>
+      </div>
+
+      <div class="field">
+        <label>Título</label>
+        <input *ngIf="editando && puedeEditar()" pInputText [(ngModel)]="ticket.titulo" />
+        <span *ngIf="!editando || !puedeEditar()">{{ ticket.titulo }}</span>
+      </div>
+
+      <div class="field">
+        <label>Descripción</label>
+        <textarea *ngIf="editando && puedeEditar()" rows="5" pTextarea [(ngModel)]="ticket.descripcion"></textarea>
+        <span *ngIf="!editando || !puedeEditar()">{{ ticket.descripcion || 'Sin descripción' }}</span>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Estado</label>
+          <p-select 
+            *ngIf="puedeCambiarEstado()" 
+            [options]="estados" 
+            [(ngModel)]="ticket.estado" 
+            (onChange)="cambiarEstado(ticket.estado)">
+          </p-select>
+          <p-tag *ngIf="!puedeCambiarEstado()" [value]="ticket.estado" [severity]="getEstadoSeverity(ticket.estado)"></p-tag>
+        </div>
+
+        <div class="field">
+          <label>Prioridad</label>
+          <p-select 
+            *ngIf="editando && puedeEditar()" 
+            [options]="prioridades" 
+            [(ngModel)]="ticket.prioridad">
+          </p-select>
+          <p-tag *ngIf="!editando || !puedeEditar()" [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)"></p-tag>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Asignado a</label>
+          <p-select 
+            *ngIf="editando && puedeEditar()" 
+            [options]="usuarios" 
+            [(ngModel)]="ticket.asignadoA">
+          </p-select>
+          <span *ngIf="!editando || !puedeEditar()">{{ ticket.asignadoA || 'Sin asignar' }}</span>
+        </div>
+
+        <div class="field">
+          <label>Fecha límite</label>
+          <p-datepicker 
+            *ngIf="editando && puedeEditar()" 
+            [(ngModel)]="ticket.fechaLimite" 
+            dateFormat="dd/mm/yy">
+          </p-datepicker>
+          <span *ngIf="!editando || !puedeEditar()">{{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Creado por</label>
+        <span>{{ ticket.creadoPor }} - {{ ticket.fechaCreacion | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    </p-card>
+
+    <!-- Comentarios e historial -->
+    <div class="right-column">
+      <p-card class="comentarios-card">
+        <h2>Comentarios</h2>
+        
+        <div class="comentarios-list">
+          <div *ngFor="let comentario of ticket.comentarios" class="comentario-item">
+            <div class="comentario-header">
+              <strong>{{ comentario.usuario }}</strong>
+              <small>{{ comentario.fecha | date:'dd/MM/yyyy HH:mm' }}</small>
+            </div>
+            <div class="comentario-texto">{{ comentario.texto }}</div>
+          </div>
+          <div *ngIf="ticket.comentarios.length === 0" class="sin-comentarios">
+            Sin comentarios
+          </div>
+        </div>
+
+        <div class="nuevo-comentario">
+          <textarea rows="3" pTextarea [(ngModel)]="nuevoComentario" placeholder="Escribe un comentario..."></textarea>
+          <p-button label="Agregar Comentario" icon="pi pi-send" (onClick)="agregarComentario()" [disabled]="!nuevoComentario.trim()"></p-button>
+        </div>
+      </p-card>
+
+      <p-card class="historial-card">
+        <h2>Historial de cambios</h2>
+        <div class="historial-list">
+          <div *ngFor="let evento of ticket.historial" class="historial-item">
+            <i class="pi pi-history"></i>
+            <span>{{ evento }}</span>
+          </div>
+          <div *ngIf="ticket.historial.length === 0" class="sin-historial">
+            Sin historial
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+</div>

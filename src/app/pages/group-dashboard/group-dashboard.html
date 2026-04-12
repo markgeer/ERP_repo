@@ -1,0 +1,103 @@
+<div class="group-dashboard">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div>
+      <h1>{{ grupoSeleccionado?.nombre || 'Dashboard' }}</h1>
+      <p class="subtitle">Resumen y gestión de tickets</p>
+    </div>
+    <div class="header-actions">
+      <p-button label="Tablero Kanban" icon="pi pi-table" (onClick)="irAKanban()"></p-button>
+      <p-button label="Nuevo Ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
+    </div>
+  </div>
+
+  <!-- Tarjetas de métricas -->
+  <div class="metrics-grid">
+    <p-card class="metric-card total">
+      <div class="metric-content">
+        <i class="pi pi-ticket metric-icon"></i>
+        <div class="metric-info">
+          <span class="metric-value">{{ totalTickets }}</span>
+          <span class="metric-label">Total Tickets</span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="metric-card pending">
+      <div class="metric-content">
+        <i class="pi pi-clock metric-icon"></i>
+        <div class="metric-info">
+          <span class="metric-value">{{ ticketsPendientes }}</span>
+          <span class="metric-label">Pendientes</span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="metric-card progress">
+      <div class="metric-content">
+        <i class="pi pi-spin pi-spinner metric-icon"></i>
+        <div class="metric-info">
+          <span class="metric-value">{{ ticketsProgreso }}</span>
+          <span class="metric-label">En Progreso</span>
+        </div>
+      </div>
+    </p-card>
+
+    <p-card class="metric-card completed">
+      <div class="metric-content">
+        <i class="pi pi-check-circle metric-icon"></i>
+        <div class="metric-info">
+          <span class="metric-value">{{ ticketsCompletados }}</span>
+          <span class="metric-label">Completados</span>
+        </div>
+      </div>
+    </p-card>
+  </div>
+
+  <!-- Asistente IA (LLM) -->
+  <p-card class="llm-card">
+    <div class="llm-header">
+      <i class="pi pi-android"></i>
+      <h3>Asistente IA</h3>
+    </div>
+    <div class="llm-messages">
+      <div *ngFor="let msg of mensajes" [class.user-message]="msg.esUsuario" class="message">
+        <div class="message-bubble">
+          <i *ngIf="!msg.esUsuario" class="pi pi-android"></i>
+          <span>{{ msg.texto }}</span>
+          <i *ngIf="msg.esUsuario" class="pi pi-user"></i>
+        </div>
+      </div>
+    </div>
+    <div class="llm-input">
+      <input pInputText [(ngModel)]="prompt" placeholder="Pregunta sobre tus tickets..." (keyup.enter)="enviarPrompt()">
+      <p-button icon="pi pi-send" (onClick)="enviarPrompt()" [disabled]="!prompt.trim()"></p-button>
+    </div>
+  </p-card>
+
+  <!-- Tickets Recientes -->
+  <p-card header="Tickets Recientes" class="recent-tickets">
+    <p-table [value]="ticketsRecientes" [rows]="5" [paginator]="true">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Título</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+          <th>Asignado</th>
+          <th>Fecha</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-ticket>
+        <tr>
+          <td>{{ ticket.id }}</td>
+          <td><a class="ticket-link" (click)="verTicket(ticket)">{{ ticket.titulo }}</a></td>
+          <td><p-tag [value]="ticket.estado" [severity]="getEstadoSeverity(ticket.estado)"></p-tag></td>
+          <td><p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)"></p-tag></td>
+          <td>{{ ticket.asignadoA }}</td>
+          <td>{{ ticket.fechaCreacion | date:'dd/MM/yyyy' }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+</div>

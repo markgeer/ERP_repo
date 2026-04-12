@@ -1,5 +1,35 @@
-<p-card header="Bienvenido a mi sistema">
-  <p>Este es el landing page del proyecto.</p>
+<div class="landing-container">
+  <div class="hero-section">
+    <h1>Bienvenido a Mi App</h1>
+    <p>Proyecto de angular realizado por Marco Ortega</p>
+    <div class="hero-buttons">
+      <p-button label="Iniciar Sesión" icon="pi pi-sign-in" (onClick)="irALogin()"></p-button>
+      <p-button label="Registrarse" icon="pi pi-user-plus" styleClass="p-button-outlined" (onClick)="irARegister()"></p-button>
+    </div>
+  </div>
 
-  <button pButton label="Ir al Login" routerLink="/login"></button>
-</p-card>
+  <div class="features-section">
+    <h2>Características</h2>
+    <div class="features-grid">
+      <p-card class="feature-card">
+        <i class="pi pi-shield"></i>
+        <h3>Seguridad</h3>
+        <p>Tus datos protegidos con los más altos estándares</p>
+      </p-card>
+      <p-card class="feature-card">
+        <i class="pi pi-chart-line"></i>
+        <h3>Estadísticas</h3>
+        <p>Visualiza tus métricas en tiempo real</p>
+      </p-card>
+      <p-card class="feature-card">
+        <i class="pi pi-users"></i>
+        <h3>Equipos</h3>
+        <p>Colabora con tu equipo fácilmente</p>
+      </p-card>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2026 ERP. Seguridad en desarrollo de aplicaciones.</p>
+  </div>
+</div>

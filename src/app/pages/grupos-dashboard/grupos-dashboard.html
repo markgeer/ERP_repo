@@ -1,0 +1,20 @@
+<div class="grupos-dashboard-container">
+  <div class="header">
+    <h1>Mis Grupos</h1>
+    <p>Selecciona un grupo para ver sus tickets</p>
+  </div>
+
+  <div class="grupos-grid">
+    <p-card *ngFor="let grupo of grupos" class="grupo-card" (click)="seleccionarGrupo(grupo)">
+      <div class="grupo-icon">
+        <i class="pi pi-users"></i>
+      </div>
+      <h3>{{ grupo.nombre }}</h3>
+      <p>{{ grupo.descripcion }}</p>
+      <div class="grupo-stats">
+        <span><i class="pi pi-ticket"></i> {{ grupo.ticketsCount || 0 }} tickets</span>
+        <span><i class="pi pi-user"></i> {{ grupo.integrantes || 0 }} miembros</span>
+      </div>
+    </p-card>
+  </div>
+</div>

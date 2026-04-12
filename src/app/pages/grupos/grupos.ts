@@ -9,8 +9,11 @@ import { CardModule } from 'primeng/card';
 import { ToolbarModule } from 'primeng/toolbar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { CommonModule } from '@angular/common';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { Grupo } from '../../models/grupo.interface';
+import { HasPermissionDirective } from '../../directives/has-permission.directive'; // Agregar
+
 
 @Component({
   selector: 'app-grupos',
@@ -21,11 +24,13 @@ import { Grupo } from '../../models/grupo.interface';
     DialogModule,
     InputTextModule,
     InputNumberModule,
+    HasPermissionDirective,
     FormsModule,
     CardModule,
     ToolbarModule,
     ConfirmDialogModule,
-    ToastModule
+    ToastModule,
+    CommonModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './grupos.html',

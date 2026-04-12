@@ -1,12 +1,23 @@
 import { Component } from '@angular/core';
-import { Card } from "primeng/card";
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-landing',
-  imports: [Card],
+  standalone: true,
+  imports: [ButtonModule, CardModule],
   templateUrl: './landing.html',
-  styleUrl: './landing.css',
+  styleUrl: './landing.css'
 })
 export class Landing {
+  constructor(private router: Router) {}
 
+  irALogin() {
+    this.router.navigate(['/login']);
+  }
+
+  irARegister() {
+    this.router.navigate(['/register']);
+  }
 }
