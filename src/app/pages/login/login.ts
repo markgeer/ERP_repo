@@ -5,9 +5,9 @@ import { Button } from "primeng/button";
 import { Password } from "primeng/password";
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-// import { Message } from "primeng/message";
+import { ApiService } from '../../services/api.service';
 import { Router } from '@angular/router';
-import { PermissionsService } from '../../services/permissions.service'; // Agregar
+import { PermissionsService } from '../../services/permissions.service';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +18,6 @@ import { PermissionsService } from '../../services/permissions.service'; // Agre
     Password, 
     FormsModule, 
     NgIf,
-    // Message
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
@@ -30,12 +29,11 @@ export class Login {
   };
 
   submitted = false;
-  private readonly VALID_USERNAME = 'admin';
-  private readonly VALID_PASSWORD = 'Admin123!';
 
   constructor(
     private router: Router,
-    private permissionsSvc: PermissionsService  // Agregar
+    private apiService: ApiService,
+    private permissionsSvc: PermissionsService
   ) {}
 
   validateForm(): boolean {
@@ -45,35 +43,52 @@ export class Login {
 
   onSubmit() {
     this.submitted = true;
-
     if (this.validateForm()) {
-      if (this.loginData.username === this.VALID_USERNAME && 
-          this.loginData.password === this.VALID_PASSWORD) {
-        
-        // Admin con todos los permisos
-        this.permissionsSvc.setPermissions([
-          'groups-view', 'groups-add', 'groups-edit', 'groups-delete',
-          'group-add', 'group-edit', 'group-delete',
-          'users-view', 'users-add', 'users-edit', 'users-delete',
-          'tickets-view', 'tickets-add', 'tickets-edit', 'tickets-delete'
-        ]);
-        
-        alert('¡Login exitoso! Bienvenido al sistema');
-        this.router.navigate(['/grupos-dashboard']);
-        
-      } else if (this.loginData.username === 'editor' && this.loginData.password === 'Editor123!') {
-      // Editor con permisos limitados - SOLO puede ver grupos
-      this.permissionsSvc.setPermissions([
-        'groups-view'
-        // NO incluir 'users-view', 'tickets-view', etc.
-      ]);
-        
-        alert('¡Login exitoso! Bienvenido editor');
-        this.router.navigate(['/grupos-dashboard']);
-        
-      } else {
-        alert('Credenciales incorrectas. Usuario: admin, Contraseña: Admin123!');
-      }
+      this.apiService.login({
+        username: this.loginData.username,
+        password: this.loginData.password
+      }).subscribe({
+        next: (response) => {
+          if (response.statusCode === 200) {
+            const token = response.data.token;
+            const user = response.data.user;
+            
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            // Decodificar el token para obtener los permisos
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            console.log('Token decodificado:', payload);
+            
+            // Extraer permisos del token
+            let permisos: string[] = [];
+            
+            // Permisos globales del usuario
+            if (payload.globalPermissions) {
+              // Aquí mapeas los IDs de permisos a strings
+              // Por ahora, asignamos según el username
+              if (user.username === 'admin') {
+                permisos = [
+                  'groups-view', 'groups-add', 'groups-edit', 'groups-delete',
+                  'users-view', 'users-add', 'users-edit', 'users-delete',
+                  'tickets-view', 'tickets-add', 'tickets-edit', 'tickets-delete',
+                  'group-add', 'group-edit', 'group-delete'
+                ];
+              } else {
+                permisos = ['groups-view', 'tickets-view'];
+              }
+            }
+            
+            this.permissionsSvc.setPermissions(permisos);
+            
+            this.router.navigate(['/grupos-dashboard']);
+          }
+        },
+        error: (error) => {
+          console.error(error);
+          alert('Credenciales incorrectas');
+        }
+      });
     }
   }
 

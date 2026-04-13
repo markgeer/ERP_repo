@@ -20,20 +20,26 @@
 
       <div class="form-row">
         <div class="field">
-          <label for="estado">Estado</label>
-          <p-select id="estado" [options]="estados" [(ngModel)]="ticket.estado" optionLabel="label"></p-select>
-        </div>
-
-        <div class="field">
           <label for="prioridad">Prioridad</label>
-          <p-select id="prioridad" [options]="prioridades" [(ngModel)]="ticket.prioridad" optionLabel="label"></p-select>
+          <p-select 
+            id="prioridad" 
+            [options]="prioridades" 
+            [(ngModel)]="ticket.prioridad" 
+            optionLabel="label"
+            optionValue="value">
+          </p-select>
         </div>
-      </div>
 
-      <div class="form-row">
         <div class="field">
           <label for="asignadoA">Asignar a</label>
-          <p-select id="asignadoA" [options]="usuarios" [(ngModel)]="ticket.asignadoA" optionLabel="label" placeholder="Seleccionar usuario"></p-select>
+          <p-select 
+            id="asignadoA" 
+            [options]="usuarios" 
+            [(ngModel)]="ticket.asignadoA" 
+            optionLabel="label"
+            optionValue="value"   
+            placeholder="Seleccionar usuario">
+          </p-select>
         </div>
 
         <div class="field">

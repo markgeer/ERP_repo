@@ -1,16 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';  // ✅ Agregar TextareaModule
-import { SelectModule } from 'primeng/select';      // ✅ Cambiar a SelectModule
+import { TextareaModule } from 'primeng/textarea';
+import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
-import { DatePickerModule } from 'primeng/datepicker'; // ✅ Cambiar a DatePickerModule
+import { DatePickerModule } from 'primeng/datepicker';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-import { TicketService } from '../../../services/ticket.service';
+import { ApiService } from '../../../services/api.service';
 
 @Component({
   selector: 'app-ticket-create',
@@ -20,32 +20,24 @@ import { TicketService } from '../../../services/ticket.service';
     FormsModule,
     CardModule,
     InputTextModule,
-    TextareaModule,      // ✅ Cambiado
-    SelectModule,        // ✅ Cambiado
+    TextareaModule,
+    SelectModule,
     ButtonModule,
-    DatePickerModule,    // ✅ Cambiado
+    DatePickerModule,
     ToastModule
   ],
   providers: [MessageService],
   templateUrl: './ticket-create.html',
   styleUrl: './ticket-create.css'
 })
-export class TicketCreateComponent {
+export class TicketCreateComponent implements OnInit {
   ticket = {
     titulo: '',
     descripcion: '',
-    estado: 'Pendiente' as const,
     prioridad: 'Media' as const,
-    asignadoA: '',
+    asignadoA: null as string | null,
     fechaLimite: null as Date | null
   };
-
-  estados = [
-    { label: 'Pendiente', value: 'Pendiente' },
-    { label: 'En Progreso', value: 'En Progreso' },
-    { label: 'Revisión', value: 'Revisión' },
-    { label: 'Hecho', value: 'Hecho' }
-  ];
 
   prioridades = [
     { label: 'Muy Alta', value: 'Muy Alta' },
@@ -55,17 +47,35 @@ export class TicketCreateComponent {
     { label: 'Muy Baja', value: 'Muy Baja' }
   ];
 
-  usuarios = [
-    { label: 'admin', value: 'admin' },
-    { label: 'editor', value: 'editor' },
-    { label: 'user1', value: 'user1' }
-  ];
+  usuarios: any[] = [];
 
   constructor(
-    private ticketService: TicketService,
+    private apiService: ApiService,
     private router: Router,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  ngOnInit() {
+    this.cargarUsuarios();
+  }
+
+  cargarUsuarios() {
+    this.apiService.getUsers().subscribe({
+      next: (response) => {
+        if (response.statusCode === 200) {
+          this.usuarios = response.data.map((user: any) => ({
+            label: user.nombre_completo || user.username,
+            value: user.id
+          }));
+          this.cdr.detectChanges();
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar usuarios:', error);
+      }
+    });
+  }
 
   crearTicket() {
     if (!this.ticket.titulo.trim()) {
@@ -76,19 +86,50 @@ export class TicketCreateComponent {
     const grupoGuardado = localStorage.getItem('grupoSeleccionado');
     const grupo = grupoGuardado ? JSON.parse(grupoGuardado) : { id: 1 };
 
-    const nuevoTicket = this.ticketService.crearTicket({
-      ...this.ticket,
-      creadoPor: 'admin',
-      grupoId: grupo.id,
-      fechaLimite: this.ticket.fechaLimite || new Date()
-    });
+    const prioridadMap: any = {
+      'Muy Baja': 1,
+      'Baja': 2,
+      'Media': 3,
+      'Alta': 4,
+      'Muy Alta': 5
+    };
 
-    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Ticket creado correctamente' });
-    
-    setTimeout(() => {
-      this.router.navigate(['/ticket', nuevoTicket.id]);
-    }, 1500);
+    // Log para ver qué prioridad está seleccionada
+    console.log('Prioridad seleccionada:', this.ticket.prioridad);
+    console.log('Prioridad ID mapeado:', prioridadMap[this.ticket.prioridad]);
+
+    // Log para ver qué usuario está seleccionado
+    console.log('Asignado A (raw):', this.ticket.asignadoA);
+    console.log('Asignado ID convertido:', this.ticket.asignadoA ? Number(this.ticket.asignadoA) : null);
+
+    const ticketData = {
+      grupo_id: Number(grupo.id),
+      titulo: String(this.ticket.titulo),
+      descripcion: String(this.ticket.descripcion || ''),
+      prioridad_id: Number(prioridadMap[this.ticket.prioridad] || 3),
+      fecha_limite: this.ticket.fechaLimite ? this.ticket.fechaLimite.toISOString().split('T')[0] : null,
+      asignado_id: this.ticket.asignadoA ? Number(this.ticket.asignadoA) : null
+    };
+
+    console.log('Datos a enviar:', JSON.stringify(ticketData, null, 2));
+
+    this.apiService.createTicket(ticketData).subscribe({
+      next: (response) => {
+        if (response.statusCode === 201) {
+          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Ticket creado correctamente' });
+          setTimeout(() => {
+            this.router.navigate(['/ticket', response.data.id]);
+          }, 1500);
+        }
+      },
+      error: (error) => {
+        console.error('Error detallado:', error);
+        console.error('Error response body:', error.error);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error?.data?.error || 'No se pudo crear el ticket' });
+      }
+    });
   }
+  
 
   cancelar() {
     this.router.navigate(['/group-dashboard']);

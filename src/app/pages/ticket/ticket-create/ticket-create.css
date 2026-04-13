@@ -7,19 +7,35 @@
 }
 
 .p-card {
+  color: #1b1b1b;
   max-width: 800px;
   width: 100%;
+  background: white !important;
+  border: 1px solid #e0e0e0 !important;
+  border-radius: 16px !important;
 }
 
 .field {
+  
   margin-bottom: 1.5rem;
 }
+
 
 .field label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #333;
+  color: #1b1b1b;
+}
+
+.field input, .field textarea, .field p-select, .field p-datepicker {
+  width: 100%;
+    background-color: #ededed;
+
+}
+
+p-datepicker input {
+  background-color: #e0e0e0;
 }
 
 .form-row {
@@ -36,6 +52,10 @@
 }
 
 @media (max-width: 768px) {
+  .ticket-create-container {
+    padding: 1rem;
+  }
+  
   .form-row {
     grid-template-columns: 1fr;
   }

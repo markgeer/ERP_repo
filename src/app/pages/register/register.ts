@@ -8,6 +8,8 @@ import { NgIf } from '@angular/common';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumber } from "primeng/inputnumber";
 import { Message } from "primeng/message";
+import { ApiService } from '../../services/api.service';
+
 
 @Component({
   selector: 'app-register',
@@ -25,6 +27,7 @@ import { Message } from "primeng/message";
   templateUrl: './register.html',
   styleUrl: './register.css'
 })
+
 export class Register {
   // Objeto para almacenar los datos del registro
   registerData = {
@@ -40,6 +43,8 @@ export class Register {
 
   // Variable para controlar el envío del formulario
   submitted = false;
+
+  constructor(private apiService: ApiService) {}
 
   // Símbolos especiales requeridos
   private readonly SPECIAL_CHARS = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
@@ -280,9 +285,26 @@ export class Register {
       this.registerData.address = this.trimValue(this.registerData.address);
       this.registerData.phone = this.trimValue(this.registerData.phone);
       
-      console.log('Registro exitoso', this.registerData);
-      alert('¡Registro exitoso!');
-      // Aquí iría la lógica para guardar el registro
+      this.apiService.register({
+        nombre_completo: this.registerData.fullName,
+        username: this.registerData.username,
+        email: this.registerData.email,
+        password: this.registerData.password,
+        direccion: this.registerData.address,
+        telefono: this.registerData.phone
+      }).subscribe({
+        next: (response) => {
+          if (response.statusCode === 201) {
+            alert('¡Registro exitoso! Ahora puedes iniciar sesión');
+            // Redirigir al login
+            window.location.href = '/login';
+          }
+        },
+        error: (error) => {
+          console.error(error);
+          alert(error.error?.data?.error || 'Error en el registro');
+        }
+      });
     }
   }
 }

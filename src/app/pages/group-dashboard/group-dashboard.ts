@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,6 +7,7 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { InputTextModule } from 'primeng/inputtext';
+import { ApiService } from '../../services/api.service';
 
 interface Ticket {
   id: number;
@@ -44,54 +45,95 @@ export class GroupDashboardComponent implements OnInit {
   // Tickets recientes
   ticketsRecientes: Ticket[] = [];
 
-
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.cargarGrupo();
-    this.cargarMetricas();
-    this.cargarTicketsRecientes();
   }
 
   cargarGrupo() {
     const grupoGuardado = localStorage.getItem('grupoSeleccionado');
     if (grupoGuardado) {
       this.grupoSeleccionado = JSON.parse(grupoGuardado);
+      this.cargarTickets();
     } else {
       this.grupoSeleccionado = { nombre: 'Mi Grupo', id: 1 };
+      this.cargarTickets();
     }
   }
 
-  cargarMetricas() {
-    // Simulación de datos
-    this.totalTickets = 12;
-    this.ticketsPendientes = 5;
-    this.ticketsProgreso = 4;
-    this.ticketsCompletados = 3;
+  cargarTickets() {
+    this.apiService.getTickets(this.grupoSeleccionado.id).subscribe({
+      next: (response) => {
+        console.log('Respuesta:', response.data);
+        
+        if (response.statusCode === 200) {
+          const tickets = response.data;
+          
+          if (!tickets || tickets.length === 0) {
+            console.log('No hay tickets');
+            return;
+          }
+          
+          // Calcular métricas usando los objetos anidados
+          this.totalTickets = tickets.length;
+          this.ticketsPendientes = tickets.filter((t: any) => t.estados?.nombre === 'Pendiente').length;
+          this.ticketsProgreso = tickets.filter((t: any) => t.estados?.nombre === 'En Progreso').length;
+          this.ticketsCompletados = tickets.filter((t: any) => t.estados?.nombre === 'Hecho').length;
+          
+          this.ticketsRecientes = tickets.slice(0, 5).map((t: any) => ({
+            id: t.id,
+            titulo: t.titulo,
+            estado: t.estados?.nombre || 'Desconocido',
+            prioridad: t.prioridades?.nombre || 'Media',
+            asignadoA: t.asignado?.username || 'Sin asignar',
+            fechaCreacion: new Date(t.creado_en)
+          }));
+          console.log('ticketsRecientes:', this.ticketsRecientes); // 👈 Agrega esto
+
+          
+          this.cdr.detectChanges();
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar tickets:', error);
+      }
+    });
   }
 
-  cargarTicketsRecientes() {
-    this.ticketsRecientes = [
-      { id: 1, titulo: 'Error en el login', estado: 'Pendiente', prioridad: 'Alta', asignadoA: 'admin', fechaCreacion: new Date('2024-03-01') },
-      { id: 2, titulo: 'Mejorar rendimiento', estado: 'En Progreso', prioridad: 'Media', asignadoA: 'editor', fechaCreacion: new Date('2024-03-02') },
-      { id: 3, titulo: 'Actualizar documentación', estado: 'Pendiente', prioridad: 'Baja', asignadoA: 'user1', fechaCreacion: new Date('2024-03-03') },
-      { id: 4, titulo: 'Corregir estilos CSS', estado: 'Completado', prioridad: 'Media', asignadoA: 'admin', fechaCreacion: new Date('2024-03-04') }
-    ];
-  }
+getEstadoNombre(estadoId: number): string {
+  const estadoMap: any = {
+    1: 'Pendiente',
+    2: 'En Progreso',
+    3: 'Hecho',
+    4: 'Cerrado'
+  };
+  return estadoMap[estadoId] || 'Desconocido';
+}
 
   crearTicket() {
     this.router.navigate(['/ticket-create']);
   }
 
   verTicket(ticket: Ticket) {
-    this.router.navigate(['/ticket', ticket.id]);
-  }
+  console.log('Haciendo clic en ticket:', ticket);
+  console.log('Navegando a:', '/ticket', ticket.id);
+  this.router.navigate(['/ticket', ticket.id]).then(success => {
+    console.log('Navegación exitosa:', success);
+  }).catch(err => {
+    console.error('Error navegación:', err);
+  });
+}
 
-  VerListaTicket(){
+  VerListaTicket() {
     this.router.navigate(['/tickets']);
   }
 
-  Gestion(){
+  Gestion() {
     this.router.navigate(['/group-management']);
   }
 
@@ -100,20 +142,22 @@ export class GroupDashboardComponent implements OnInit {
   }
 
   getEstadoSeverity(estado: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | null | undefined {
-  switch(estado) {
-    case 'Pendiente': return 'warn';      // Cambiado de 'warning' a 'warn'
-    case 'En Progreso': return 'info';
-    case 'Completado': return 'success';
-    default: return 'secondary';
+    switch(estado) {
+      case 'Pendiente': return 'warn';
+      case 'En Progreso': return 'info';
+      case 'Completado': return 'success';
+      default: return 'secondary';
+    }
   }
-}
 
-getPrioridadSeverity(prioridad: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | null | undefined {
-  switch(prioridad) {
-    case 'Alta': return 'danger';
-    case 'Media': return 'warn';           // Cambiado de 'warning' a 'warn'
-    case 'Baja': return 'success';
-    default: return 'info';
-  }
+  getPrioridadSeverity(prioridad: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | null | undefined {
+    switch(prioridad) {
+      case 'Muy Alta': return 'danger';
+      case 'Alta': return 'danger';
+      case 'Media': return 'warn';
+      case 'Baja': return 'info';
+      case 'Muy Baja': return 'success';
+      default: return 'info';
+    }
   }
 }

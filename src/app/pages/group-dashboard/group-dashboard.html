@@ -60,7 +60,7 @@
 
   <!-- Tickets Recientes -->
   <p-card header="Tickets Recientes" class="recent-tickets">
-    <p-table [value]="ticketsRecientes" [rows]="5" [paginator]="true">
+    <p-table [value]="ticketsRecientes" [rows]="5" [paginator]="true" [scrollable]="true" scrollHeight="400px">
       <ng-template pTemplate="header">
         <tr>
           <th>ID</th>
