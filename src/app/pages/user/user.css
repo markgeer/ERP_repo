@@ -10,8 +10,8 @@
 
 .profile-header h1 {
   margin: 0;
-  color: #333;
   font-size: 2rem;
+  color: #333;
 }
 
 .profile-grid {
@@ -22,18 +22,19 @@
 }
 
 .profile-main {
-  grid-row: span 2; /* Ocupa 2 filas */
+  grid-row: span 2;
 }
 
 .profile-card {
-  border: 1px solid #e0e0e065 !important;
-  margin-bottom: 0;
+  background: #fcfcfc;
+  border: 1px solid #33333365 !important;
+  border-radius: 16px !important;
 }
 
 .profile-card h3 {
   margin: 0 0 1rem 0;
-  color: #333;
   font-size: 1.2rem;
+  color: #000;
 }
 
 .avatar-section {
@@ -44,30 +45,30 @@
 
 .avatar-info p {
   margin: 0.25rem 0;
-  color: #ffffff;
+  color: #2d2d2d;
 }
-
 
 .password-section {
   border-top: 1px solid #e0e0e0;
   padding-top: 1rem;
+  color: #333;
 }
 
 .password-section label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #666;
   font-weight: 500;
+  color: #666;
 }
 
 .password-display {
   display: flex;
   align-items: center;
-  border: 1px solid #e0e0e076;
   justify-content: space-between;
-  background: #000000;
+  gap: 1px;
+  background: #fff;
+  border: 1px solid #00000076;
 }
-
 
 .info-field input {
   width: 100%;
@@ -77,11 +78,58 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  border-top: 1px solid #e0e0e0;
   padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
 }
 
-input[readonly] {
-  background-color: #000000;
-  cursor: default;
+.stats-mini {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.ticket-list {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.ticket-list li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mt-4 {
+  margin-top: 1rem;
+}
+
+/* Inputs - modo vista y edición unificado */
+.info-field input {
+  background-color: #f6f6f6;
+  border: 1px solid #e2e8f0;
+  color: #000;
+}
+
+.info-field input:not([readonly]) {
+  background-color: #fff;
+  border-color: #667eea;
+}
+
+/* Datepicker y Password */
+:host ::ng-deep .p-datepicker input,
+:host ::ng-deep .p-password input {
+  background-color: #f6f6f6;
+  border: 1px solid #e2e8f0;
+}
+
+:host ::ng-deep .p-datepicker:not(.p-disabled) input,
+:host ::ng-deep .p-password:not(.p-disabled) input {
+  background-color: #fff;
+  border-color: #000000;
+}
+
+::placeholder {
+  color: #94a3b8;
 }

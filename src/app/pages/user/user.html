@@ -120,6 +120,26 @@
     </p-card>
   </div>
 
+      <!-- Tickets asignados -->
+  <p-card header="Mis Tickets Asignados">
+    <p-table [value]="ticketsAsignados" [paginator]="true" [rows]="3">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Título</th>
+          <th>Estado</th>
+          <th>Prioridad</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-t>
+        <tr>
+          <td>{{ t.titulo }}</td>
+          <td><p-tag [value]="t.estado" [severity]="getEstadoSeverity(t.estado)"></p-tag></td>
+          <td><p-tag [value]="t.prioridad" severity="info"></p-tag></td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
   <!-- Botones de acción -->
   <div class="actions">
     <ng-container *ngIf="!editando; else editandoTemplate">
@@ -151,4 +171,5 @@
       ></p-button>
     </ng-template>
   </div>
+  
 </div>

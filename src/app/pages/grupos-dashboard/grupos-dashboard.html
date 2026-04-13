@@ -1,19 +1,47 @@
 <div class="grupos-dashboard-container">
-  <div class="header">
-    <h1>Mis Grupos</h1>
-    <p>Selecciona un grupo para ver sus tickets</p>
+  <div class="page-header">
+    <div>
+      <h1>Mis Grupos</h1>
+      <p class="subtitle">Selecciona un grupo para ver sus tickets y actividades</p>
+    </div>
   </div>
 
+  <!-- Tarjetas de resumen -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <i class="pi pi-users"></i>
+      <div>
+        <span class="stat-value">{{ grupos.length }}</span>
+        <span class="stat-label">Total Grupos</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="pi pi-ticket"></i>
+      <div>
+        <span class="stat-value">{{ totalTickets }}</span>
+        <span class="stat-label">Total Tickets</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <i class="pi pi-user-plus"></i>
+      <div>
+        <span class="stat-value">{{ totalMiembros }}</span>
+        <span class="stat-label">Miembros</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid de grupos -->
   <div class="grupos-grid">
     <p-card *ngFor="let grupo of grupos" class="grupo-card" (click)="seleccionarGrupo(grupo)">
-      <div class="grupo-icon">
-        <i class="pi pi-users"></i>
-      </div>
       <h3>{{ grupo.nombre }}</h3>
-      <p>{{ grupo.descripcion }}</p>
+      <p class="grupo-desc">{{ grupo.descripcion }}</p>
       <div class="grupo-stats">
-        <span><i class="pi pi-ticket"></i> {{ grupo.ticketsCount || 0 }} tickets</span>
-        <span><i class="pi pi-user"></i> {{ grupo.integrantes || 0 }} miembros</span>
+        <span><i class="pi pi-ticket">Total de tickets</i> {{ grupo.ticketsCount || 0 }}</span>
+        <span><i class="pi pi-users">Integrantes:</i> {{ grupo.integrantes || 0 }}</span>
+      </div>
+      <div class="grupo-footer">
+        <span class="ver-mas">Ver detalles →</span>
       </div>
     </p-card>
   </div>

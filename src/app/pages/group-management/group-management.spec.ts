@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { GroupManagement } from './group-management';
+import { GroupManagementComponent } from './group-management';
 
-describe('GroupManagement', () => {
-  let component: GroupManagement;
-  let fixture: ComponentFixture<GroupManagement>;
+describe('GroupManagementComponent', () => {
+  let component: GroupManagementComponent;
+  let fixture: ComponentFixture<GroupManagementComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GroupManagement]
+      imports: [GroupManagementComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(GroupManagement);
+    fixture = TestBed.createComponent(GroupManagementComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

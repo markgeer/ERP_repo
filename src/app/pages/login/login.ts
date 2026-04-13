@@ -53,6 +53,7 @@ export class Login {
         // Admin con todos los permisos
         this.permissionsSvc.setPermissions([
           'groups-view', 'groups-add', 'groups-edit', 'groups-delete',
+          'group-add', 'group-edit', 'group-delete',
           'users-view', 'users-add', 'users-edit', 'users-delete',
           'tickets-view', 'tickets-add', 'tickets-edit', 'tickets-delete'
         ]);

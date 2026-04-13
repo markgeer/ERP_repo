@@ -9,6 +9,8 @@ import { MessageService } from 'primeng/api';
 import { PasswordModule } from 'primeng/password';
 import { DatePickerModule } from 'primeng/datepicker';
 import { AvatarModule } from 'primeng/avatar';
+import { TableModule } from 'primeng/table';
+import { TagModule } from 'primeng/tag';
 
 @Component({
   selector: 'app-user',
@@ -23,6 +25,7 @@ import { AvatarModule } from 'primeng/avatar';
     PasswordModule,
     DatePickerModule,
     AvatarModule
+    , TableModule, TagModule
   ],
   providers: [MessageService],
   templateUrl: './user.html',
@@ -46,6 +49,10 @@ export class UserComponent {
   userBackup: any = {};
   submitted: boolean = false;
   maxDate: Date = new Date();
+  // Agrega estas propiedades después de maxDate
+  ticketsAsignados: any[] = [];
+  totalTickets = 0;
+  ticketsPendientes = 0;
 
   private readonly SPECIAL_CHARS = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
   private readonly EMAIL_PATTERN = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -182,18 +189,37 @@ export class UserComponent {
   }
 
     // Agrega este método
-  tieneSimboloEspecial(password: string): boolean {
-    return /[!@#$%^&*]/.test(password);
+    tieneSimboloEspecial(password: string): boolean {
+      return /[!@#$%^&*]/.test(password);
+    }
+
+    eliminar() {
+      if (confirm('¿Estás seguro de eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cuenta eliminada',
+          detail: 'Tu cuenta ha sido eliminada (simulado)'
+        });
+        alert('Cuenta eliminada (simulado)');
+      }
+    }
+    cargarTickets() {
+  this.ticketsAsignados = [
+      { id: 1, titulo: 'Error en el login', estado: 'Pendiente', prioridad: 'Alta' },
+      { id: 2, titulo: 'Mejorar rendimiento', estado: 'En Progreso', prioridad: 'Media' },
+      { id: 3, titulo: 'Actualizar documentación', estado: 'Pendiente', prioridad: 'Baja' }
+    ];
   }
 
-  eliminar() {
-    if (confirm('¿Estás seguro de eliminar tu cuenta? Esta acción no se puede deshacer.')) {
-      this.messageService.add({
-        severity: 'info',
-        summary: 'Cuenta eliminada',
-        detail: 'Tu cuenta ha sido eliminada (simulado)'
-      });
-      alert('Cuenta eliminada (simulado)');
-    }
+  ngOnInit() {
+    this.cargarTickets();
   }
+
+  getEstadoSeverity(estado: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | null | undefined {
+  switch(estado) {
+    case 'Pendiente': return 'warn';
+    case 'En Progreso': return 'info';
+    default: return 'secondary';
+  }
+}
 }

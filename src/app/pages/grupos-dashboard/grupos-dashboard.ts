@@ -29,6 +29,15 @@ export class GruposDashboardComponent implements OnInit {
     ];
   }
 
+  // Agregar después de grupos
+  get totalTickets(): number {
+    return this.grupos.reduce((sum, g) => sum + (g.ticketsCount || 0), 0);
+  }
+
+  get totalMiembros(): number {
+    return this.grupos.reduce((sum, g) => sum + (g.integrantes || 0), 0);
+  }
+
   seleccionarGrupo(grupo: any) {
     localStorage.setItem('grupoSeleccionado', JSON.stringify(grupo));
     this.router.navigate(['/group-dashboard']);

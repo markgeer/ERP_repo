@@ -17,11 +17,6 @@ interface Ticket {
   fechaCreacion: Date;
 }
 
-interface Mensaje {
-  texto: string;
-  esUsuario: boolean;
-}
-
 @Component({
   selector: 'app-group-dashboard',
   standalone: true,
@@ -48,10 +43,7 @@ export class GroupDashboardComponent implements OnInit {
   
   // Tickets recientes
   ticketsRecientes: Ticket[] = [];
-  
-  // LLM (simulado)
-  prompt: string = '';
-  mensajes: Mensaje[] = [];
+
 
   constructor(private router: Router) {}
 
@@ -59,7 +51,6 @@ export class GroupDashboardComponent implements OnInit {
     this.cargarGrupo();
     this.cargarMetricas();
     this.cargarTicketsRecientes();
-    this.mensajeBienvenida();
   }
 
   cargarGrupo() {
@@ -88,50 +79,20 @@ export class GroupDashboardComponent implements OnInit {
     ];
   }
 
-  mensajeBienvenida() {
-    this.mensajes.push({
-      texto: `¡Hola! Soy tu asistente IA. Puedo ayudarte a gestionar los tickets del grupo "${this.grupoSeleccionado?.nombre}". ¿Qué necesitas?`,
-      esUsuario: false
-    });
-  }
-
-  enviarPrompt() {
-    if (!this.prompt.trim()) return;
-
-    // Agregar mensaje del usuario
-    this.mensajes.push({
-      texto: this.prompt,
-      esUsuario: true
-    });
-
-    // Simular respuesta del LLM
-    setTimeout(() => {
-      let respuesta = '';
-      const promptLower = this.prompt.toLowerCase();
-      
-      if (promptLower.includes('ticket') || promptLower.includes('tickets')) {
-        respuesta = `Tienes ${this.totalTickets} tickets en total. ${this.ticketsPendientes} pendientes, ${this.ticketsProgreso} en progreso y ${this.ticketsCompletados} completados.`;
-      } else if (promptLower.includes('ayuda')) {
-        respuesta = 'Puedo ayudarte con: ver resumen de tickets, buscar tickets por estado, o darte estadísticas del grupo.';
-      } else {
-        respuesta = `Entiendo tu consulta sobre "${this.prompt}". Puedes usar el tablero Kanban para gestionar los tickets visualmente.`;
-      }
-      
-      this.mensajes.push({
-        texto: respuesta,
-        esUsuario: false
-      });
-    }, 500);
-
-    this.prompt = '';
-  }
-
   crearTicket() {
     this.router.navigate(['/ticket-create']);
   }
 
   verTicket(ticket: Ticket) {
     this.router.navigate(['/ticket', ticket.id]);
+  }
+
+  VerListaTicket(){
+    this.router.navigate(['/tickets']);
+  }
+
+  Gestion(){
+    this.router.navigate(['/group-management']);
   }
 
   irAKanban() {

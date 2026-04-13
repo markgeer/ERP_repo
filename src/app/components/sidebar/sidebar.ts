@@ -55,18 +55,18 @@ export class Sidebar implements OnInit { // Cambiar a implements OnInit
       menuItems.push({
         label: 'Usuarios',
         icon: 'pi pi-user',
-        routerLink: ['/users']
+        routerLink: ['/user-management']
       });
     }
 
     // Tickets - solo si tiene permiso tickets-view
-    if (this.permissionsSvc.hasAnyPermission(['tickets-view'])) {
-      menuItems.push({
-        label: 'Tickets',
-        icon: 'pi pi-ticket',
-        routerLink: ['/tickets']
-      });
-    }
+    // if (this.permissionsSvc.hasAnyPermission(['tickets-view'])) {
+    //   menuItems.push({
+    //     label: 'Tickets',
+    //     icon: 'pi pi-ticket',
+    //     routerLink: ['/tickets']
+    //   });
+    // }
 
     // Perfil - siempre visible
     menuItems.push({
