@@ -15,6 +15,8 @@ import { TicketDetailComponent } from './pages/ticket/ticket-detail/ticket-detai
 import { TicketListComponent } from './pages/ticket/ticket-list/ticket-list';
 import { GroupManagementComponent } from './pages/group-management/group-management';
 import { UserManagementComponent } from './pages/user-management/user-management';
+import { AuthGuard } from './guards/auth.guard';
+import { PermissionGuard } from './guards/permission.guard';
 
 export const routes: Routes = [
   // Rutas públicas (sin layout)
@@ -27,18 +29,19 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayout,
+    canActivate: [AuthGuard],
     children: [
       { path: 'home', component: Home },
       { path: 'grupos', component: GruposComponent },
       { path: 'profile', component: UserComponent },
       { path: 'grupos-dashboard', component: GruposDashboardComponent },
       { path: 'group-dashboard', component: GroupDashboardComponent },
-      { path: 'kanban', component: KanbanComponent },
-      { path: 'tickets', component: TicketListComponent },
-      { path: 'ticket/:id', component: TicketDetailComponent },
-      { path: 'ticket-create', component: TicketCreateComponent },
+      { path: 'kanban', component: KanbanComponent,canActivate: [PermissionGuard], data: { permission: 'tickets:view' } },
+      { path: 'tickets', component: TicketListComponent, canActivate: [PermissionGuard], data: { permission: 'tickets:view' } },
+      { path: 'ticket/:id', component: TicketDetailComponent, canActivate: [PermissionGuard], data: { permission: 'tickets:view' } },
+      { path: 'ticket-create', component: TicketCreateComponent, canActivate: [PermissionGuard], data: { permission: 'tickets:add' } },
       { path: 'group-management', component: GroupManagementComponent },
-      { path: 'user-management', component: UserManagementComponent }
+      { path: 'user-management', component: UserManagementComponent },
     ]
   },
   

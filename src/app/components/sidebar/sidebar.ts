@@ -1,34 +1,45 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { Button } from "primeng/button";
 import { Avatar } from "primeng/avatar";
 import { Menu } from "primeng/menu";
 import { MenuItem } from 'primeng/api';
-// import { HasPermissionDirective } from '../../directives/has-permission.directive';
-import { PermissionsService } from '../../services/permissions.service'; // Agregar
+import { PermissionsService } from '../../services/permissions.service';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [Button, Avatar, Menu, ],
+  imports: [Button, Avatar, Menu],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css'
 })
-export class Sidebar implements OnInit { // Cambiar a implements OnInit
+export class Sidebar implements OnInit {
   items: MenuItem[] = [];
-  user: any;
+  user: any = { name: 'Usuario', email: 'usuario@email.com' };
 
   constructor(
     private router: Router,
-    private permissionsSvc: PermissionsService // Agregar
-  ) {
-    this.user = {
-      name: 'Usuario',
-      email: 'usuario@email.com'
-    };
-  }
+    private permissionsSvc: PermissionsService
+  ) {}
 
   ngOnInit() {
+    this.cargarDatosUsuario();
     this.generarMenu();
+  }
+
+  cargarDatosUsuario() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      this.user = {
+        name: payload.username || 'Usuario',
+        email: payload.email || 'usuario@email.com'
+      };
+      console.log('Usuario cargado:', this.user);
+    } catch (error) {
+      console.error('Error al cargar usuario:', error);
+    }
   }
 
   generarMenu() {
@@ -41,32 +52,23 @@ export class Sidebar implements OnInit { // Cambiar a implements OnInit
       routerLink: ['/grupos-dashboard']
     });
 
-    // Grupos - solo si tiene permiso groups-view
-    if (this.permissionsSvc.hasAnyPermission(['groups-view'])) {
+    // Gestion de Grupos
+    if (this.permissionsSvc.hasAnyPermission(['group:view', 'group:add', 'group:edit', 'group:delete'])) {
       menuItems.push({
-        label: 'Gestion de Grupos',
-        icon: 'pi pi-users',
+        label: 'Gestión de Grupos',
+        icon: 'pi pi-cog',
         routerLink: ['/grupos']
       });
     }
 
-    // Usuarios - solo si tiene permiso users-view
-    if (this.permissionsSvc.hasAnyPermission(['users-view'])) {
+    // Usuarios - solo SuperAdmin
+    if (this.permissionsSvc.hasAnyPermission(['user:manage'])) {
       menuItems.push({
-        label: 'Usuarios',
-        icon: 'pi pi-user',
+        label: 'Gestión de Usuarios',
+        icon: 'pi pi-users',
         routerLink: ['/user-management']
       });
     }
-
-    // Tickets - solo si tiene permiso tickets-view
-    // if (this.permissionsSvc.hasAnyPermission(['tickets-view'])) {
-    //   menuItems.push({
-    //     label: 'Tickets',
-    //     icon: 'pi pi-ticket',
-    //     routerLink: ['/tickets']
-    //   });
-    // }
 
     // Perfil - siempre visible
     menuItems.push({
@@ -79,7 +81,8 @@ export class Sidebar implements OnInit { // Cambiar a implements OnInit
   }
 
   logout() {
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     this.router.navigate(['/login']);
   }
 }

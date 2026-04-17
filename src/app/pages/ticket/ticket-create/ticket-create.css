@@ -29,9 +29,23 @@
 }
 
 .field input, .field textarea, .field p-select, .field p-datepicker {
+  color: #1b1b1b;
   width: 100%;
     background-color: #ededed;
+}
 
+.form-row .field input, .form-row .field textarea, .form-row .field p-select, .form-row .field p-datepicker {
+  background-color: #1b1b1b;
+}
+
+.field2 {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.fieldrow {
+  background-color: #1b1b1b;
 }
 
 p-datepicker input {

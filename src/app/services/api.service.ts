@@ -26,21 +26,38 @@ export class ApiService {
   }
 
   // ========== USERS ==========
+
   getUsers(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/user/users`, { headers: this.getHeaders() });
+  return this.http.get(`${this.apiUrl}/user/users`, { headers: this.getHeaders() });
+}
+
+  getUser(id: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/user/users/${id}`, { headers: this.getHeaders() });
   }
 
   updateUser(id: number, data: any): Observable<any> {
+    console.log('API updateUser llamada con:', id, data); // 👈 Depuración
     return this.http.put(`${this.apiUrl}/user/users/${id}`, data, { headers: this.getHeaders() });
   }
 
   deleteUser(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/user/users/${id}`, { headers: this.getHeaders() });
+    const token = localStorage.getItem('token');
+    // ✅ SOLO Authorization, sin Content-Type
+    const headers = new HttpHeaders({
+      'Authorization': token ? `Bearer ${token}` : ''
+    });
+    return this.http.delete(`${this.apiUrl}/user/users/${id}`, { headers });
   }
+
+  
 
   // ========== GROUPS ==========
   getGroups(): Observable<any> {
     return this.http.get(`${this.apiUrl}/groups/groups`, { headers: this.getHeaders() });
+  }
+
+  getAllGroups(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/groups/groups/all`, { headers: this.getHeaders() });
   }
 
   createGroup(group: any): Observable<any> {
@@ -52,19 +69,46 @@ export class ApiService {
   }
 
   deleteGroup(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/groups/groups/${id}`, { headers: this.getHeaders() });
+    const token = localStorage.getItem('token');
+    // ✅ Solo Authorization, sin Content-Type
+    const headers = new HttpHeaders({
+      'Authorization': token ? `Bearer ${token}` : ''
+    });
+    return this.http.delete(`${this.apiUrl}/groups/groups/${id}`, { headers });
   }
 
   getGroupMembers(groupId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/groups/groups/${groupId}/members`, { headers: this.getHeaders() });
   }
 
-  addMember(groupId: number, email: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/groups/groups/${groupId}/members`, { email }, { headers: this.getHeaders() });
+  addMember(groupId: number, email: string, permisos?: number[]): Observable<any> {
+    const body: any = { email };
+    if (permisos && permisos.length > 0) {
+      body.permisos = permisos;
+    }
+    console.log('Request body:', body); // 👈 Depuración
+    return this.http.post(`${this.apiUrl}/groups/groups/${groupId}/members`, body, { headers: this.getHeaders() });
   }
 
   removeMember(groupId: number, userId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/groups/groups/${groupId}/members/${userId}`, { headers: this.getHeaders() });
+    const token = localStorage.getItem('token');
+    // ✅ Solo Authorization, sin Content-Type
+    const headers = new HttpHeaders({
+      'Authorization': token ? `Bearer ${token}` : ''
+    });
+    
+    return this.http.delete(`${this.apiUrl}/groups/groups/${groupId}/members/${userId}`, { headers });
+  }
+
+  assignGroupPermissions(groupId: number, userId: number, permisos: number[]): Observable<any> {
+    return this.http.put(`${this.apiUrl}/groups/groups/${groupId}/permissions/${userId}`, 
+      { permisos }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
+  addMemberWithPermissions(groupId: number, body: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/groups/groups/${groupId}/members`, body, { headers: this.getHeaders() });
   }
 
   // ========== TICKETS ==========
@@ -106,5 +150,14 @@ export class ApiService {
   getTicketHistory(ticketId: number): Observable<any> {
     return this.http.get(`${this.apiUrl}/tickets/tickets/${ticketId}/history`, { headers: this.getHeaders() });
   }
-  
+
+  // ========== SUPERADMIN ==========
+  updateUserPermissions(userId: number, permisos: number[]): Observable<any> {
+    console.log('Enviando permisos a la API:', userId, permisos);
+    return this.http.put(`${this.apiUrl}/user/users/${userId}/permissions`, 
+      { permisos }, 
+      { headers: this.getHeaders() }
+    );
+  }
+
 }

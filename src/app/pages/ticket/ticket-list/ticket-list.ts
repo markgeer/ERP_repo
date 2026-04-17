@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -8,7 +8,20 @@ import { TagModule } from 'primeng/tag';
 import { ButtonModule } from 'primeng/button';
 import { SelectModule } from 'primeng/select';
 import { InputTextModule } from 'primeng/inputtext';
-import { TicketService, Ticket } from '../../../services/ticket.service';
+import { ApiService } from '../../../services/api.service';
+
+interface Ticket {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  estado: string;
+  prioridad: string;
+  asignadoA: string;
+  estado_id: number;
+  prioridad_id: number;
+  creado_en: string;
+  fecha_limite: string;
+}
 
 @Component({
   selector: 'app-ticket-list',
@@ -54,27 +67,64 @@ export class TicketListComponent implements OnInit {
     { label: 'Muy Baja', value: 'Muy Baja' }
   ];
   
-  usuarios = [
-    { label: 'Todos', value: '' },
-    { label: 'admin', value: 'admin' },
-    { label: 'editor', value: 'editor' },
-    { label: 'user1', value: 'user1' }
-  ];
+  usuarios: any[] = [{ label: 'Todos', value: '' }];
 
   constructor(
     private router: Router,
-    private ticketService: TicketService
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    this.cargarUsuarios();
     this.cargarTickets();
+  }
+
+  cargarUsuarios() {
+    this.apiService.getUsers().subscribe({
+      next: (response) => {
+        if (response.statusCode === 200) {
+          const usuariosBackend = response.data.map((user: any) => ({
+            label: user.nombre_completo || user.username,
+            value: user.username
+          }));
+          this.usuarios = [{ label: 'Todos', value: '' }, ...usuariosBackend];
+          this.cdr.detectChanges();
+        }
+      },
+      error: (error) => console.error('Error al cargar usuarios:', error)
+    });
   }
 
   cargarTickets() {
     const grupoGuardado = localStorage.getItem('grupoSeleccionado');
     const grupo = grupoGuardado ? JSON.parse(grupoGuardado) : { id: 1 };
-    this.tickets = this.ticketService.getTicketsByGrupo(grupo.id);
-    this.aplicarFiltros();
+
+    this.apiService.getTickets(grupo.id).subscribe({
+      next: (response) => {
+        if (response.statusCode === 200) {
+          // Mapear datos del backend al formato esperado
+          this.tickets = response.data.map((t: any) => ({
+            id: t.id,
+            titulo: t.titulo,
+            descripcion: t.descripcion,
+            estado: t.estados?.nombre || 'Desconocido',
+            prioridad: t.prioridades?.nombre || 'Media',
+            asignadoA: t.asignado?.username || 'Sin asignar',
+            creadoPor: t.autor?.username || 'Desconocido',  // ✅ Agregar
+            estado_id: t.estado_id,
+            prioridad_id: t.prioridad_id,
+            creado_en: t.creado_en,
+            fecha_limite: t.fecha_limite
+          }));
+          this.aplicarFiltros();
+          this.cdr.detectChanges();
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar tickets:', error);
+      }
+    });
   }
 
   aplicarFiltros() {
@@ -92,11 +142,12 @@ export class TicketListComponent implements OnInit {
       if (this.busqueda) {
         const busquedaLower = this.busqueda.toLowerCase();
         return ticket.titulo.toLowerCase().includes(busquedaLower) ||
-               ticket.descripcion.toLowerCase().includes(busquedaLower);
+               (ticket.descripcion && ticket.descripcion.toLowerCase().includes(busquedaLower));
       }
       
       return true;
     });
+    this.cdr.detectChanges();
   }
 
   limpiarFiltros() {

@@ -7,6 +7,8 @@ import { TagModule } from 'primeng/tag';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { CdkDrag, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { ApiService } from '../../services/api.service';
+import { PermissionsService } from '../../services/permissions.service';
+
 
 // Interfaz basada en la respuesta real del backend
 export interface Ticket {
@@ -50,7 +52,8 @@ export class KanbanComponent implements OnInit {
   constructor(
     private router: Router,
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public permissionsSvc: PermissionsService
   ) {}
 
   ngOnInit() {
@@ -69,14 +72,14 @@ export class KanbanComponent implements OnInit {
           this.ticketsProgreso   = todos.filter(t => t.estados.nombre === 'En Progreso');
           this.ticketsRevision   = todos.filter(t => t.estados.nombre === 'Revisión');
           this.ticketsHecho      = todos.filter(t => t.estados.nombre === 'Hecho');
-          this.cargando = false;        // ✅ Dentro del if
-          this.cdr.detectChanges();     // ✅ Dentro del if, después de asignar todo
+          this.cargando = false;        //  Dentro del if
+          this.cdr.detectChanges();     //  Dentro del if, después de asignar todo
         }
       },
       error: (error) => {
         console.error('Error al cargar tickets:', error);
         this.cargando = false;
-        this.cdr.detectChanges();       // ✅ También en error para quitar el spinner
+        this.cdr.detectChanges();       //  También en error para quitar el spinner
       }
     });
   }
@@ -84,7 +87,7 @@ export class KanbanComponent implements OnInit {
   onDrop(event: CdkDragDrop<Ticket[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-      this.cdr.detectChanges(); // ✅
+      this.cdr.detectChanges();
       return;
     }
 
@@ -94,7 +97,7 @@ export class KanbanComponent implements OnInit {
       event.previousIndex,
       event.currentIndex
     );
-    this.cdr.detectChanges(); // ✅ Refleja el drag inmediatamente
+    this.cdr.detectChanges();
 
     const ticketMovido = event.container.data[event.currentIndex];
     const estadoMap: Record<string, string> = {
@@ -107,9 +110,15 @@ export class KanbanComponent implements OnInit {
 
     if (ticketMovido && nuevoEstado) {
       ticketMovido.estados = { ...ticketMovido.estados, nombre: nuevoEstado };
+
       this.apiService.updateTicketStatus(ticketMovido.id, nuevoEstado).subscribe({
+        next: () => {
+          // ✅ Recarga desde el backend para confirmar el estado real
+          this.cargarTickets();
+        },
         error: (err) => {
           console.error('Error al actualizar estado:', err);
+          // ✅ Si falla, revierte recargando
           this.cargarTickets();
         }
       });

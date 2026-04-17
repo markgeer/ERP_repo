@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CardModule } from 'primeng/card';
@@ -11,6 +11,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { AvatarModule } from 'primeng/avatar';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-user',
@@ -24,24 +25,26 @@ import { TagModule } from 'primeng/tag';
     ToastModule,
     PasswordModule,
     DatePickerModule,
-    AvatarModule
-    , TableModule, TagModule
+    AvatarModule,
+    TableModule,
+    TagModule
   ],
   providers: [MessageService],
   templateUrl: './user.html',
   styleUrl: './user.css'
 })
-export class UserComponent {
+export class UserComponent implements OnInit {
   userData = {
-    username: 'jperez',
-    email: 'juan.perez@email.com',
-    fullName: 'Juan Pérez',
-    address: 'Calle Principal 123',
-    phone: '5512345678',
-    birthDate: new Date('1995-05-15')
+    id: 0,
+    username: '',
+    email: '',
+    fullName: '',
+    address: '',
+    phone: '',
+    birthDate: null as Date | null
   };
 
-  lastLogin = new Date('2024-03-17T14:54:00');
+  lastLogin: Date = new Date();
   editando: boolean = false;
   cambiandoPassword: boolean = false;
   newPassword: string = '';
@@ -49,7 +52,7 @@ export class UserComponent {
   userBackup: any = {};
   submitted: boolean = false;
   maxDate: Date = new Date();
-  // Agrega estas propiedades después de maxDate
+  
   ticketsAsignados: any[] = [];
   totalTickets = 0;
   ticketsPendientes = 0;
@@ -59,7 +62,87 @@ export class UserComponent {
   private readonly PHONE_PATTERN = /^[0-9]{10}$/;
   private readonly NO_SPACES_EDGES_PATTERN = /^\S.*\S$/;
 
-  constructor(private messageService: MessageService) {}
+  constructor(
+    private messageService: MessageService,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
+    this.cargarPerfil();
+    this.cargarTicketsAsignados();
+  }
+
+  cargarPerfil() {
+    console.log('=== CARGANDO PERFIL ===');
+    const token = localStorage.getItem('token');
+    console.log('Token existe?', !!token);
+    
+    if (!token) return;
+    
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const userId = payload.userId;
+    console.log('UserId desde token:', userId);
+    
+    this.apiService.getUser(userId).subscribe({
+      next: (response) => {
+        console.log('Respuesta del backend:', response);
+        if (response.statusCode === 200) {
+          const user = response.data;
+          console.log('Datos del usuario:', user);
+          this.userData = {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            fullName: user.nombre_completo || '',
+            address: user.direccion || '',
+            phone: user.telefono || '',
+            birthDate: null
+          };
+          console.log('userData después de asignar:', this.userData);
+          this.cdr.detectChanges();
+        } else {
+          console.log('Error en respuesta:', response);
+        }
+      },
+      error: (error) => {
+        console.error('Error detallado:', error);
+      }
+    });
+  }
+
+  cargarTicketsAsignados() {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const userId = payload.userId;
+    
+    // Obtener tickets asignados al usuario
+    const grupoGuardado = localStorage.getItem('grupoSeleccionado');
+    const grupoId = grupoGuardado ? JSON.parse(grupoGuardado).id : 1;
+    
+    this.apiService.getTickets(grupoId).subscribe({
+      next: (response) => {
+        if (response.statusCode === 200) {
+          this.ticketsAsignados = response.data
+            .filter((t: any) => t.asignado_id === userId)
+            .map((t: any) => ({
+              id: t.id,
+              titulo: t.titulo,
+              estado: t.estados?.nombre || 'Desconocido',
+              prioridad: t.prioridades?.nombre || 'Media'
+            }));
+          this.totalTickets = this.ticketsAsignados.length;
+          this.ticketsPendientes = this.ticketsAsignados.filter(t => t.estado === 'Pendiente').length;
+          this.cdr.detectChanges();
+        }
+      },
+      error: (error) => {
+        console.error('Error al cargar tickets:', error);
+      }
+    });
+  }
 
   isEmailValid(): boolean {
     const email = this.userData.email;
@@ -107,8 +190,7 @@ export class UserComponent {
     return this.isEmailValid() && 
            this.isFullNameValid() && 
            this.isAddressValid() && 
-           this.isPhoneValid() && 
-           this.isAgeValid();
+           this.isPhoneValid();
   }
 
   getErrorMessage(fieldName: string): string {
@@ -146,11 +228,18 @@ export class UserComponent {
 
   guardarPassword() {
     if (this.passwordValida()) {
-      this.cambiandoPassword = false;
-      this.newPassword = '';
-      this.confirmNewPassword = '';
-      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Contraseña actualizada correctamente' });
-      alert('¡Contraseña actualizada correctamente!');
+      this.apiService.updateUser(this.userData.id, { password: this.newPassword }).subscribe({
+        next: () => {
+          this.cambiandoPassword = false;
+          this.newPassword = '';
+          this.confirmNewPassword = '';
+          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Contraseña actualizada correctamente' });
+        },
+        error: (error) => {
+          console.error('Error al cambiar contraseña:', error);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cambiar contraseña' });
+        }
+      });
     }
   }
 
@@ -167,15 +256,45 @@ export class UserComponent {
   }
 
   guardar() {
+    console.log('=== GUARDAR LLAMADO ===');
     this.submitted = true;
+    console.log('formValido?', this.formValido());
+    
     if (this.formValido()) {
-      this.editando = false;
-      this.cambiandoPassword = false;
-      this.newPassword = '';
-      this.confirmNewPassword = '';
-      this.submitted = false;
-      this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Perfil actualizado correctamente' });
-      alert('¡Perfil actualizado correctamente!');
+      const updateData = {
+        nombre_completo: this.userData.fullName,
+        email: this.userData.email,
+        direccion: this.userData.address,
+        telefono: this.userData.phone
+      };
+      
+      console.log('Enviando datos de actualización:', updateData);
+      
+      this.apiService.updateUser(this.userData.id, updateData).subscribe({
+        next: (response) => {
+          console.log('Respuesta del backend:', response);
+          if (response.statusCode === 200) {
+            this.editando = false;
+            this.cambiandoPassword = false;
+            this.newPassword = '';
+            this.confirmNewPassword = '';
+            this.submitted = false;
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Perfil actualizado correctamente' });
+            this.cargarPerfil();
+          }
+        },
+        error: (error) => {
+          console.error('Error al actualizar perfil:', error);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al actualizar perfil' });
+        }
+      });
+    } else {
+      console.log('Formulario inválido, campos con error:', {
+        email: this.isEmailValid(),
+        fullName: this.isFullNameValid(),
+        address: this.isAddressValid(),
+        phone: this.isPhoneValid()
+      });
     }
   }
 
@@ -188,38 +307,37 @@ export class UserComponent {
     this.submitted = false;
   }
 
-    // Agrega este método
-    tieneSimboloEspecial(password: string): boolean {
-      return /[!@#$%^&*]/.test(password);
-    }
-
-    eliminar() {
-      if (confirm('¿Estás seguro de eliminar tu cuenta? Esta acción no se puede deshacer.')) {
-        this.messageService.add({
-          severity: 'info',
-          summary: 'Cuenta eliminada',
-          detail: 'Tu cuenta ha sido eliminada (simulado)'
-        });
-        alert('Cuenta eliminada (simulado)');
-      }
-    }
-    cargarTickets() {
-  this.ticketsAsignados = [
-      { id: 1, titulo: 'Error en el login', estado: 'Pendiente', prioridad: 'Alta' },
-      { id: 2, titulo: 'Mejorar rendimiento', estado: 'En Progreso', prioridad: 'Media' },
-      { id: 3, titulo: 'Actualizar documentación', estado: 'Pendiente', prioridad: 'Baja' }
-    ];
+  tieneSimboloEspecial(password: string): boolean {
+    return /[!@#$%^&*]/.test(password);
   }
 
-  ngOnInit() {
-    this.cargarTickets();
+  eliminar() {
+    if (confirm('¿Estás seguro de eliminar tu cuenta? Esta acción no se puede deshacer.')) {
+      this.apiService.deleteUser(this.userData.id).subscribe({
+        next: (response) => {
+          if (response.statusCode === 200) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            this.messageService.add({ severity: 'success', summary: 'Cuenta eliminada', detail: 'Tu cuenta ha sido eliminada' });
+            setTimeout(() => {
+              window.location.href = '/landing';
+            }, 1500);
+          }
+        },
+        error: (error) => {
+          console.error('Error detallado:', error.error); // 👈 Ver el error del backend
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: error.error?.data?.error || 'No se pudo eliminar la cuenta' });
+        }
+      });
+    }
   }
 
   getEstadoSeverity(estado: string): "success" | "secondary" | "info" | "warn" | "danger" | "contrast" | null | undefined {
-  switch(estado) {
-    case 'Pendiente': return 'warn';
-    case 'En Progreso': return 'info';
-    default: return 'secondary';
+    switch(estado) {
+      case 'Pendiente': return 'warn';
+      case 'En Progreso': return 'info';
+      case 'Hecho': return 'success';
+      default: return 'secondary';
+    }
   }
-}
 }

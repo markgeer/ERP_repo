@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -11,73 +11,124 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 import { CommonModule } from '@angular/common';
 import { ConfirmationService, MessageService } from 'primeng/api';
-import { Grupo } from '../../models/grupo.interface';
-import { HasPermissionDirective } from '../../directives/has-permission.directive'; // Agregar
+import { HasPermissionDirective } from '../../directives/has-permission.directive';
+import { ApiService } from '../../services/api.service';
 
+interface Grupo {
+  id?: number;
+  nombre: string;
+  descripcion: string;
+  creador_id?: number;
+  creado_en?: string;
+  miembros?: any[];
+  tickets?: any[];
+  integrantes?: number;
+  ticketsCount?: number;
+}
 
 @Component({
   selector: 'app-grupos',
   standalone: true,
   imports: [
-    TableModule,
-    ButtonModule,
-    DialogModule,
-    InputTextModule,
-    InputNumberModule,
-    HasPermissionDirective,
-    FormsModule,
-    CardModule,
-    ToolbarModule,
-    ConfirmDialogModule,
-    ToastModule,
-    CommonModule
+    TableModule, ButtonModule, DialogModule, InputTextModule, InputNumberModule,
+    HasPermissionDirective, FormsModule, CardModule, ToolbarModule,
+    ConfirmDialogModule, ToastModule, CommonModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './grupos.html',
   styleUrl: './grupos.css'
 })
 export class GruposComponent implements OnInit {
+  currentUserId: number = 0;
   grupos: Grupo[] = [];
+  grupoSeleccionado: Grupo | null = null;
   grupoDialog: boolean = false;
+  grupoDetalleDialog: boolean = false;
   grupo: Grupo = this.inicializarGrupo();
   submitted: boolean = false;
-  
-  // Opciones para nivel (puedes ajustar según necesites)
-  niveles: any[] = [
-    { label: 'Básico', value: 'Básico' },
-    { label: 'Intermedio', value: 'Intermedio' },
-    { label: 'Avanzado', value: 'Avanzado' }
-  ];
+  miembrosDialog: any[] = [];
 
   constructor(
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
-    this.cargarGruposIniciales();
+    this.cargarGrupos();
   }
 
   inicializarGrupo(): Grupo {
     return {
-      nivel: '',
-      autor: '',
       nombre: '',
-      integrantes: 0,
-      tickets: 0,
       descripcion: ''
     };
   }
 
-  cargarGruposIniciales() {
-    // Datos de ejemplo (Registro 2, perfiles 1-5)
-    this.grupos = [
-      { id: 1, nivel: 'Básico', autor: 'Juan Pérez', nombre: 'Grupo Alpha', integrantes: 5, tickets: 4, descripcion: 'Grupo de principiantes' },
-      { id: 2, nivel: 'Intermedio', autor: 'María García', nombre: 'Grupo Beta', integrantes: 8, tickets: 7, descripcion: 'Grupo intermedio' },
-      { id: 3, nivel: 'Avanzado', autor: 'Carlos López', nombre: 'Grupo Gamma', integrantes: 6, tickets: 5, descripcion: 'Grupo avanzado' },
-      { id: 4, nivel: 'Básico', autor: 'Ana Martínez', nombre: 'Grupo Delta', integrantes: 7, tickets: 6, descripcion: 'Grupo básico 2' },
-      { id: 5, nivel: 'Intermedio', autor: 'Pedro Sánchez', nombre: 'Grupo Epsilon', integrantes: 4, tickets: 3, descripcion: 'Grupo intermedio 2' }
-    ];
+  cargarGrupos() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      this.currentUserId = payload.userId;
+    }
+    
+    this.apiService.getAllGroups().subscribe({
+      next: (response) => {
+        if (response.statusCode === 200) {
+          this.grupos = response.data.map((g: any) => ({
+            id: g.id,
+            nombre: g.nombre,
+            descripcion: g.descripcion || '',
+            creador_id: g.creador_id,
+            creado_en: g.creado_en,
+            integrantes: 0,
+            ticketsCount: 0
+          }));
+          this.cargarDetallesGrupos();
+          this.cdr.detectChanges();
+        }
+      }
+    });
+  }
+
+  cargarDetallesGrupos() {
+    this.grupos.forEach((grupo, index) => {
+      this.apiService.getGroupMembers(grupo.id!).subscribe({
+        next: (response) => {
+          if (response.statusCode === 200) {
+            this.grupos[index].integrantes = response.data.length;
+            this.cdr.detectChanges();
+          }
+        }
+      });
+      
+      this.apiService.getTickets(grupo.id!).subscribe({
+        next: (response) => {
+          if (response.statusCode === 200) {
+            this.grupos[index].ticketsCount = response.data.length;
+            this.cdr.detectChanges();
+          }
+        }
+      });
+    });
+  }
+
+  verDetalleGrupo(grupo: Grupo) {
+    this.grupoSeleccionado = grupo;
+    this.cargarMiembrosGrupo(grupo.id!);
+    this.grupoDetalleDialog = true;
+  }
+
+  cargarMiembrosGrupo(grupoId: number) {
+    this.apiService.getGroupMembers(grupoId).subscribe({
+      next: (response) => {
+        if (response.statusCode === 200) {
+          this.miembrosDialog = response.data;
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
 
   abrirNuevo() {
@@ -92,13 +143,41 @@ export class GruposComponent implements OnInit {
   }
 
   eliminarGrupo(grupo: Grupo) {
+    // Obtener el ID del usuario actual desde el token
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentUserId = payload.userId;
+    
+    // Verificar si el usuario actual es el creador del grupo
+    if (grupo.creador_id !== currentUserId) {
+      this.messageService.add({ 
+        severity: 'warn', 
+        summary: 'Sin permiso', 
+        detail: 'Solo el creador del grupo puede eliminarlo' 
+      });
+      return;
+    }
+    
     this.confirmationService.confirm({
-      message: '¿Estás seguro de eliminar el grupo ' + grupo.nombre + '?',
+      message: '¿Estás seguro de eliminar el grupo ' + grupo.nombre + '? Se eliminarán todos sus tickets y miembros.',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.grupos = this.grupos.filter(g => g.id !== grupo.id);
-        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Grupo eliminado', life: 3000 });
+        this.apiService.deleteGroup(grupo.id!).subscribe({
+          next: (response) => {
+            if (response.statusCode === 200) {
+              this.grupos = this.grupos.filter(g => g.id !== grupo.id);
+              this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Grupo eliminado' });
+              this.cdr.detectChanges();
+            }
+          },
+          error: (error) => {
+            console.error('Error al eliminar grupo:', error);
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo eliminar el grupo' });
+          }
+        });
       }
     });
   }
@@ -106,33 +185,63 @@ export class GruposComponent implements OnInit {
   guardarGrupo() {
     this.submitted = true;
 
-    if (this.camposValidos()) {
-      if (this.grupo.id) {
-        // Actualizar
-        const index = this.grupos.findIndex(g => g.id === this.grupo.id);
-        if (index !== -1) {
-          this.grupos[index] = { ...this.grupo };
-          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Grupo actualizado', life: 3000 });
-        }
-      } else {
-        // Crear nuevo
-        this.grupo.id = this.grupos.length + 1;
-        this.grupos.push({ ...this.grupo });
-        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Grupo creado', life: 3000 });
-      }
-      
-      this.grupoDialog = false;
-      this.grupo = this.inicializarGrupo();
+    if (!this.grupo.nombre?.trim()) {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El nombre es requerido' });
+      return;
     }
-  }
 
-  camposValidos(): boolean {
-    const nombreValido = !!this.grupo.nombre?.trim();
-    const autorValido = !!this.grupo.autor?.trim();
-    const nivelValido = !!this.grupo.nivel?.trim();
-    const integrantesValidos = this.grupo.integrantes > 0;
-    
-    return nombreValido && autorValido && nivelValido && integrantesValidos;
+    if (this.grupo.id) {
+      // Actualizar
+      this.apiService.updateGroup(this.grupo.id, {
+        nombre: this.grupo.nombre,
+        descripcion: this.grupo.descripcion
+      }).subscribe({
+        next: (response) => {
+          if (response.statusCode === 200) {
+            const index = this.grupos.findIndex(g => g.id === this.grupo.id);
+            if (index !== -1) {
+              this.grupos[index] = { ...this.grupos[index], ...this.grupo };
+            }
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Grupo actualizado' });
+            this.grupoDialog = false;
+            this.cdr.detectChanges();
+          }
+        },
+        error: (error) => {
+          console.error('Error al actualizar grupo:', error);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo actualizar el grupo' });
+        }
+      });
+    } else {
+      // Crear nuevo grupo - el creador se asigna automáticamente como admin
+      this.apiService.createGroup({
+        nombre: this.grupo.nombre,
+        descripcion: this.grupo.descripcion
+      }).subscribe({
+        next: (response) => {
+          if (response.statusCode === 201) {
+            const nuevoGrupo = response.data;
+            this.grupos.push({
+              id: nuevoGrupo.id,
+              nombre: nuevoGrupo.nombre,
+              descripcion: nuevoGrupo.descripcion || '',
+              creador_id: nuevoGrupo.creador_id,
+              creado_en: nuevoGrupo.creado_en,
+              integrantes: 1, // El creador es miembro
+              ticketsCount: 0
+            });
+            this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Grupo creado. Eres el administrador del grupo.' });
+            this.grupoDialog = false;
+            this.cdr.detectChanges();
+          }
+        },
+        error: (error) => {
+          console.error('Error al crear grupo:', error);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo crear el grupo' });
+        }
+      });
+    }
+    this.grupo = this.inicializarGrupo();
   }
 
   ocultarDialog() {
@@ -140,13 +249,11 @@ export class GruposComponent implements OnInit {
     this.submitted = false;
   }
 
-  // Agrega estas propiedades al final del componente
   get totalTickets(): number {
-    return this.grupos.reduce((sum, g) => sum + (g.tickets || 0), 0);
+    return this.grupos.reduce((sum, g) => sum + (g.ticketsCount || 0), 0);
   }
 
   get totalMiembros(): number {
     return this.grupos.reduce((sum, g) => sum + (g.integrantes || 0), 0);
   }
-
 }

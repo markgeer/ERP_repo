@@ -1,5 +1,6 @@
 <div class="user-container">
   <p-toast></p-toast>
+  <p-confirmdialog></p-confirmdialog>
 
   <div class="page-header">
     <div>
@@ -7,15 +8,15 @@
       <p class="subtitle">Administra los usuarios del sistema</p>
     </div>
     <p-button 
-      *ifHasPermission="'users-add'"
+      *ifHasPermission="'user:add'"
       label="Nuevo Usuario" 
       icon="pi pi-plus" 
       styleClass="p-button-primary"
-      (onClick)="nuevoUsuario()"
+      (onClick)="abrirNuevo()"
     ></p-button>
   </div>
 
-  <!-- Tarjetas de resumen -->
+  <!-- Tarjeta de resumen -->
   <div class="stats-grid">
     <div class="stat-card">
       <i class="pi pi-users"></i>
@@ -24,33 +25,15 @@
         <span class="stat-label">Total Usuarios</span>
       </div>
     </div>
-    <div class="stat-card">
-      <i class="pi pi-shield"></i>
-      <div>
-        <span class="stat-value">{{ getSuperAdmins() }}</span>
-        <span class="stat-label">SuperAdmins</span>
-      </div>
-    </div>
-    <div class="stat-card">
-      <i class="pi pi-user-edit"></i>
-      <div>
-        <span class="stat-value">{{ getEditores() }}</span>
-        <span class="stat-label">Editores</span>
-      </div>
-    </div>
   </div>
 
-
-  //solo para que se guarde un cambio y no se pierda el trabajo hecho en el projecto gracias a un commit de git xd
-
   <p-card>
-    <p-table [value]="usuarios" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]">
+    <p-table [value]="usuarios" [paginator]="true" [rows]="5">
       <ng-template pTemplate="header">
         <tr>
           <th>Usuario</th>
           <th>Nombre</th>
           <th>Email</th>
-          <th>Rol</th>
           <th>Acciones</th>
         </tr>
       </ng-template>
@@ -59,21 +42,20 @@
           <td>{{ u.username }}</td>
           <td>{{ u.fullName }}</td>
           <td>{{ u.email }}</td>
-          <td><p-tag [value]="u.rol" [severity]="getRolSeverity(u.rol)"></p-tag></td>
           <td>
             <div class="acciones">
               <p-button 
-                *ifHasPermission="'users-edit'"
+                *ifHasPermission="'user:edit'"
                 icon="pi pi-pencil" 
                 styleClass="p-button-rounded p-button-text"
                 (onClick)="editarUsuario(u)"
-              ></p-button>
+              >✎</p-button>
               <p-button 
-                *ifHasPermission="'users-delete'"
+                *ifHasPermission="'user:delete'"
                 icon="pi pi-trash" 
                 styleClass="p-button-rounded p-button-text p-button-danger"
                 (onClick)="eliminarUsuario(u)"
-              ></p-button>
+              >✖</p-button>
             </div>
           </td>
         </tr>
@@ -81,39 +63,76 @@
     </p-table>
   </p-card>
 
-  <!-- Diálogo -->
+  <!-- Diálogo para crear/editar usuario -->
   <p-dialog 
     [header]="editando ? 'Editar Usuario' : 'Nuevo Usuario'" 
     [(visible)]="dialogVisible" 
     [modal]="true" 
-    [style]="{width: '450px'}"
+    [style]="{width: '550px'}"
   >
     <div class="p-fluid">
-      <div class="field">
-        <label>Usuario *</label>
-        <input pInputText [(ngModel)]="usuarioForm.username" />
+      <div class="form-row">
+        <div class="field">
+          <label>Usuario *</label>
+          <input pInputText [(ngModel)]="usuarioForm.username" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Email *</label>
+          <input pInputText [(ngModel)]="usuarioForm.email" class="w-full" />
+        </div>
       </div>
+
       <div class="field">
         <label>Nombre completo *</label>
-        <input pInputText [(ngModel)]="usuarioForm.fullName" />
+        <input pInputText [(ngModel)]="usuarioForm.fullName" class="w-full" />
       </div>
-      <div class="field">
-        <label>Email *</label>
-        <input pInputText [(ngModel)]="usuarioForm.email" />
+
+      <div class="form-row">
+        <div class="field">
+          <label>Teléfono</label>
+          <input pInputText [(ngModel)]="usuarioForm.phone" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Dirección</label>
+          <input pInputText [(ngModel)]="usuarioForm.address" class="w-full" />
+        </div>
       </div>
+
+      @if (!editando) {
+        <div class="form-row">
+          <div class="field">
+            <label>Contraseña *</label>
+            <input type="password" pInputText [(ngModel)]="usuarioForm.password" class="w-full" />
+          </div>
+          <div class="field">
+            <label>Confirmar contraseña *</label>
+            <input type="password" pInputText [(ngModel)]="usuarioForm.confirmPassword" class="w-full" />
+          </div>
+        </div>
+      }
+
       <div class="field">
-        <label>Rol</label>
-        <select [(ngModel)]="usuarioForm.rol" class="p-inputtext">
-          <option value="SuperAdmin">SuperAdmin</option>
-          <option value="Admin">Admin</option>
-          <option value="Editor">Editor</option>
-          <option value="Usuario">Usuario</option>
-        </select>
+        <label>Permisos Globales</label>
+        <div class="permisos-grid">
+          @for (permiso of permisosDisponibles; track permiso.id) {
+            <div class="permiso-item">
+              <p-checkbox 
+                [binary]="true" 
+                [(ngModel)]="permiso.seleccionado"
+                (onChange)="togglePermiso(permiso)"
+              ></p-checkbox>
+              <label>{{ permiso.nombre }}</label>
+            </div>
+          }
+        </div>
       </div>
     </div>
+
     <ng-template pTemplate="footer">
-      <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" (onClick)="dialogVisible = false"></p-button>
-      <p-button label="Guardar" icon="pi pi-check" (onClick)="guardar()"></p-button>
+      <div class="dialog-footer">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-secondary" (onClick)="dialogVisible = false"></p-button>
+        <p-button label="Guardar" icon="pi pi-check" styleClass="p-button-primary" (onClick)="guardar()"></p-button>
+      </div>
     </ng-template>
   </p-dialog>
 </div>

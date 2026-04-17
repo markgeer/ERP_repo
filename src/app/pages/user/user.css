@@ -62,6 +62,7 @@
 }
 
 .password-display {
+  color: #333;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -120,6 +121,7 @@
 /* Datepicker y Password */
 :host ::ng-deep .p-datepicker input,
 :host ::ng-deep .p-password input {
+  color: #000;
   background-color: #f6f6f6;
   border: 1px solid #e2e8f0;
 }

@@ -9,7 +9,7 @@
       <p class="subtitle">Administra los grupos de trabajo y sus miembros</p>
     </div>
     <p-button 
-      *ifHasPermission="'groups-add'"
+      *ifHasPermission="'group:add'"
       label="Nuevo Grupo"
       icon="pi pi-plus"
       styleClass="p-button-primary"
@@ -17,7 +17,7 @@
     ></p-button>
   </div>
 
-  <!-- Tarjetas de resumen (nuevo) -->
+  <!-- Tarjetas de resumen -->
   <div class="stats-grid">
     <div class="stat-card">
       <i class="pi pi-users"></i>
@@ -54,38 +54,38 @@
       <ng-template pTemplate="header">
         <tr>
           <th>ID</th>
-          <th>Nivel</th>
-          <th>Autor</th>
           <th>Nombre</th>
-          <th>Integrantes</th>
-          <th>Tickets</th>
           <th>Descripción</th>
+          <th>Miembros</th>
+          <th>Tickets</th>
           <th>Acciones</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-grupo>
         <tr>
           <td>{{ grupo.id }}</td>
-          <td>{{ grupo.nivel }}</td>
-          <td>{{ grupo.autor }}</td>
-          <td>{{ grupo.nombre }}</td>
-          <td>{{ grupo.integrantes }}</td>
-          <td>{{ grupo.tickets }}</td>
-          <td>{{ grupo.descripcion }}</td>
+          <td>
+            <a class="grupo-link" (click)="verDetalleGrupo(grupo)">{{ grupo.nombre }}</a>
+          </td>
+          <td>{{ grupo.descripcion || 'Sin descripción' }}</td>
+          <td>{{ grupo.integrantes || 0 }}</td>
+          <td>{{ grupo.ticketsCount || 0 }}</td>
           <td>
             <div class="acciones">
+              @if (grupo.creador_id === currentUserId) {
               <p-button 
-                *ifHasPermission="'groups-edit'"
+                *ifHasPermission="'group:edit'"
                 icon="pi pi-pencil"
                 styleClass="p-button-rounded p-button-text p-button-sm"
                 (onClick)="editarGrupo(grupo)"
               >✎</p-button>
-              <p-button 
-                *ifHasPermission="'groups-delete'"
-                icon="pi pi-trash"
-                styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
-                (onClick)="eliminarGrupo(grupo)"
-              >🗑</p-button>
+                <p-button 
+                  *ifHasPermission="'group:delete'"
+                  icon="pi pi-trash"
+                  styleClass="p-button-rounded p-button-text p-button-danger p-button-sm"
+                  (onClick)="eliminarGrupo(grupo)"
+                >✖</p-button>
+              }
             </div>
           </td>
         </tr>
@@ -93,76 +93,25 @@
     </p-table>
   </p-card>
 
-  <!-- Dialog para crear/editar grupo -->
+  <!-- Diálogo para crear/editar grupo -->
   <p-dialog 
     [(visible)]="grupoDialog" 
-    [style]="{width: '500px'}" 
-    header="{{ grupo.id ? 'Editar Grupo' : 'Nuevo Grupo' }}" 
+    [style]="{width: '450px'}" 
+    [header]="grupo.id ? 'Editar Grupo' : 'Nuevo Grupo'" 
     [modal]="true"
     (onHide)="ocultarDialog()"
   >
     <div class="p-fluid">
       <div class="field">
-        <label for="nivel">Nivel</label>
-        <select 
-            id="nivel"
-            [(ngModel)]="grupo.nivel" 
-            class="p-inputtext" 
-            [class.ng-invalid]="submitted && !grupo.nivel"
-        >
-            <option *ngFor="let nivel of niveles" [value]="nivel.value">
-              {{ nivel.label }}
-            </option>
-        </select>
-        <small *ngIf="submitted && !grupo.nivel" class="p-error">Nivel requerido</small>
-      </div>
-
-      <div class="field">
-        <label for="autor">Autor</label>
-        <input 
-          id="autor"
-          type="text" 
-          pInputText 
-          [(ngModel)]="grupo.autor"
-          [class.ng-invalid]="submitted && !grupo.autor"
-        />
-        <small *ngIf="submitted && !grupo.autor" class="p-error">Autor requerido</small>
-      </div>
-
-      <div class="field">
-        <label for="nombre">Nombre del Grupo</label>
+        <label for="nombre">Nombre del Grupo *</label>
         <input 
           id="nombre"
           type="text" 
           pInputText 
           [(ngModel)]="grupo.nombre"
-          [class.ng-invalid]="submitted && !grupo.nombre"
+          class="w-full"
         />
         <small *ngIf="submitted && !grupo.nombre" class="p-error">Nombre requerido</small>
-      </div>
-
-      <div class="field">
-        <label for="integrantes">Número de Integrantes</label>
-        <p-inputNumber 
-          id="integrantes"
-          [(ngModel)]="grupo.integrantes"
-          [showButtons]="true"
-          [min]="1"
-          [max]="100"
-          [class.ng-invalid]="submitted && !grupo.integrantes"
-        ></p-inputNumber>
-        <small *ngIf="submitted && !grupo.integrantes" class="p-error">Integrantes requeridos</small>
-      </div>
-
-      <div class="field">
-        <label for="tickets">Tickets</label>
-        <p-inputNumber 
-          id="tickets"
-          [(ngModel)]="grupo.tickets"
-          [showButtons]="true"
-          [min]="0"
-          [max]="grupo.integrantes"
-        ></p-inputNumber>
       </div>
 
       <div class="field">
@@ -171,7 +120,8 @@
           id="descripcion"
           pInputTextarea 
           [(ngModel)]="grupo.descripcion"
-          [rows]="3"
+          rows="3"
+          class="w-full"
         ></textarea>
       </div>
     </div>
@@ -187,8 +137,44 @@
         label="Guardar" 
         icon="pi pi-check" 
         (onClick)="guardarGrupo()"
-        [disabled]="submitted && !camposValidos()"
+        [disabled]="submitted && !grupo.nombre"
       ></p-button>
+    </ng-template>
+  </p-dialog>
+
+  <!-- Diálogo para ver detalle del grupo -->
+  <p-dialog 
+    [(visible)]="grupoDetalleDialog" 
+    [style]="{width: '600px'}" 
+    header="Detalle del Grupo" 
+    [modal]="true"
+  >
+    <div *ngIf="grupoSeleccionado" class="grupo-detalle">
+      <div class="detalle-info">
+        <h3>{{ grupoSeleccionado.nombre }}</h3>
+        <p><strong>Descripción:</strong> {{ grupoSeleccionado.descripcion || 'Sin descripción' }}</p>
+        <p><strong>ID:</strong> {{ grupoSeleccionado.id }}</p>
+        <p><strong>Creado:</strong> {{ grupoSeleccionado.creado_en | date:'dd/MM/yyyy HH:mm' }}</p>
+        <p><strong>Total Tickets:</strong> {{ grupoSeleccionado.ticketsCount || 0 }}</p>
+      </div>
+      
+      <h4>Miembros del Grupo ({{ miembrosDialog.length }})</h4>
+      <p-table [value]="miembrosDialog" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr><th>Usuario</th><th>Nombre</th><th>Email</th><th>Fecha unión</th></tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-miembro>
+          <tr>
+            <td>{{ miembro.username }}</td>
+            <td>{{ miembro.nombre_completo }}</td>
+            <td>{{ miembro.email }}</td>
+            <td>{{ miembro.fecha_unido | date:'dd/MM/yyyy' }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+    <ng-template pTemplate="footer">
+      <p-button label="Cerrar" icon="pi pi-times" (onClick)="grupoDetalleDialog = false"></p-button>
     </ng-template>
   </p-dialog>
 </div>

@@ -4,6 +4,8 @@ import { Router } from '@angular/router';
 import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ApiService } from '../../services/api.service';
+import { PermissionsService } from '../../services/permissions.service';
+
 
 @Component({
   selector: 'app-grupos-dashboard',
@@ -17,7 +19,8 @@ export class GruposDashboardComponent implements OnInit {
 
   constructor(private router: Router,
               private apiService: ApiService
-              , private cdr: ChangeDetectorRef
+              , private cdr: ChangeDetectorRef,
+              private permissionsSvc: PermissionsService
   ) {}
 
   ngOnInit() {
@@ -82,6 +85,46 @@ export class GruposDashboardComponent implements OnInit {
   }
 
 
+  // Agrega este método en la clase
+  actualizarPermisosPorGrupo(grupoId: number) {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    
+    const permisosMap: Record<number, string> = {
+      1: 'user:view', 2: 'user:add', 3: 'user:edit', 4: 'user:edit:profile',
+      5: 'user:delete', 6: 'user:manage', 7: 'group:view', 8: 'group:add',
+      9: 'group:edit', 10: 'group:delete', 11: 'group:manage',
+      12: 'tickets:view', 13: 'tickets:add', 14: 'tickets:edit', 15: 'tickets:delete',
+      16: 'tickets:edit:state', 17: 'tickets:edit:comment', 18: 'tickets:manage',
+      19: 'tickets:move', 20: 'group:add:member', 21: 'group:delete:member',
+      22: 'group:edit:config', 23: 'tickets:move:own'
+    };
+    
+    let permisos: string[] = [];
+    
+    // Permisos globales
+    if (payload.globalPermissions) {
+      permisos = payload.globalPermissions.map((id: number) => permisosMap[id]).filter(Boolean);
+    }
+    
+    // Permisos específicos del grupo
+    if (payload.permissionsByGroup && payload.permissionsByGroup[grupoId]) {
+      const permisosGrupo = payload.permissionsByGroup[grupoId].permisos;
+      if (permisosGrupo) {
+        const permisosGrupoStrings = permisosGrupo.map((id: number) => permisosMap[id]).filter(Boolean);
+        permisos = [...new Set([...permisos, ...permisosGrupoStrings])];
+        console.log('Permisos del grupo añadidos:', permisosGrupoStrings);
+      }
+    }
+    
+    if (permisos.length === 0) {
+      permisos = ['group:view', 'tickets:view'];
+    }
+    
+    console.log('Permisos totales para grupo', grupoId, ':', permisos);
+  }
   
 
   // Agregar después de grupos
@@ -93,8 +136,10 @@ export class GruposDashboardComponent implements OnInit {
     return this.grupos.reduce((sum, g) => sum + (g.integrantes || 0), 0);
   }
 
+  // Modifica seleccionarGrupo:
   seleccionarGrupo(grupo: any) {
     localStorage.setItem('grupoSeleccionado', JSON.stringify(grupo));
+    this.actualizarPermisosPorGrupo(grupo.id); // Agregar esta línea
     this.router.navigate(['/group-dashboard']);
   }
 }

@@ -13,6 +13,9 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { ApiService } from '../../../services/api.service';
+import { HasPermissionDirective } from '../../../directives/has-permission.directive';
+import { PermissionsService } from '../../../services/permissions.service';
+
 
 @Component({
   selector: 'app-ticket-detail',
@@ -28,7 +31,8 @@ import { ApiService } from '../../../services/api.service';
     DatePickerModule,
     TagModule,
     DividerModule,
-    ToastModule
+    ToastModule,
+    HasPermissionDirective
   ],
   providers: [MessageService],
   templateUrl: './ticket-detail.html',
@@ -66,7 +70,8 @@ export class TicketDetailComponent implements OnInit {
     private router: Router,
     private apiService: ApiService,
     private messageService: MessageService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public permissionsSvc: PermissionsService
   ) {}
 
   ngOnInit() {

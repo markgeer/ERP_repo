@@ -20,10 +20,10 @@
     </div>
     <div class="stat-card">
       <i class="pi pi-tag"></i>
-      <div>
+      <!-- <div>
         <span class="stat-value">{{ roles.length }}</span>
         <span class="stat-label">Roles</span>
-      </div>
+      </div> -->
     </div>
   </div>
 
@@ -32,7 +32,7 @@
     <div class="card-header">
       <h3>Configuración del Grupo</h3>
       @if (!editandoGrupo) {
-        <p-button *ifHasPermission="'group-edit'" label="Editar" icon="pi pi-pencil" styleClass="p-button-text" (onClick)="editandoGrupo = true"></p-button>
+        <p-button *ifHasPermission="'group:edit'" label="Editar" icon="pi pi-pencil" styleClass="p-button-text" (onClick)="editandoGrupo = true"></p-button>
       }
     </div>
     
@@ -59,7 +59,7 @@
   <p-card>
     <div class="card-header">
       <h3>Miembros del Grupo</h3>
-      <p-button *ifHasPermission="'group-add'" label="Agregar Usuario" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="abrirDialogAgregar()"></p-button>
+      <p-button *ifHasPermission="'group:add:member'" label="Agregar Usuario" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="abrirDialogAgregar()"></p-button>
     </div>
 
     <p-table [value]="usuarios" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5,10,20]">
@@ -68,7 +68,7 @@
           <th>Usuario</th>
           <th>Nombre</th>
           <th>Email</th>
-          <th>Rol</th>
+          <!-- <th>Rol</th> -->
           <th>Acciones</th>
         </tr>
       </ng-template>
@@ -77,10 +77,10 @@
           <td>{{ u.username }}</td>
           <td>{{ u.fullName }}</td>
           <td>{{ u.email }}</td>
-          <td><p-tag [value]="u.rol" [severity]="getRolSeverity(u.rol)"></p-tag></td>
+          <!-- <td><p-tag [value]="u.rol" [severity]="getRolSeverity(u.rol)"></p-tag></td> -->
           <td>
             <div class="acciones">
-              <p-button *ifHasPermission="'group-delete'" icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" (onClick)="eliminarUsuario(u)"></p-button>
+              <p-button *ifHasPermission="'group:delete:member'" icon="pi pi-trash" styleClass="p-button-rounded p-button-text p-button-danger" (onClick)="eliminarUsuario(u)">✖</p-button>
             </div>
           </td>
         </tr>
@@ -89,27 +89,99 @@
   </p-card>
 
   <!-- Diálogo -->
+  <!-- Diálogo -->
   <p-dialog 
-    header="Agregar Usuario" 
+    header="Agregar Usuario al Grupo" 
     [(visible)]="mostrarDialogAgregar" 
     [modal]="true" 
-    [style]="{width: '450px'}"
+    [style]="{width: '600px'}"
+    [draggable]="false"
+    [closable]="true"
   >
     <div class="p-fluid">
+      <!-- Email -->
       <div class="field">
-        <label>Email *</label>
-        <input pInputText [(ngModel)]="nuevoUsuarioEmail" placeholder="usuario@email.com" class="w-full" />
+        <label for="email">Correo electrónico *</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-envelope"></i>
+          </span>
+          <input 
+            id="email" 
+            type="email" 
+            pInputText 
+            [(ngModel)]="nuevoUsuarioEmail" 
+            placeholder="usuario@ejemplo.com" 
+            class="w-full" 
+          />
+        </div>
+        <small class="p-text-secondary">Ingresa el email del usuario que deseas agregar</small>
       </div>
+      
+      <!-- Permisos - Organizados por categoría -->
       <div class="field">
-        <label>Rol</label>
-        <select class="p-inputtext w-full" [(ngModel)]="nuevoUsuarioRol">
-          <option *ngFor="let rol of roles" [value]="rol.value">{{ rol.label }}</option>
-        </select>
+        <label>Permisos del usuario en este grupo</label>
+        <div class="permisos-container">
+          <!-- Permisos de Tickets -->
+          <div class="permiso-categoria">
+            <div class="categoria-header" (click)="toggleCategoria('tickets')">
+              <i [class]="categoriasAbiertas['tickets'] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+              <strong>🎫 Tickets</strong>
+              <span class="categoria-count">{{ permisosTickets.length }}</span>
+            </div>
+            <div class="permiso-items" *ngIf="categoriasAbiertas['tickets']">
+              <div *ngFor="let permiso of permisosTickets" class="permiso-item">
+                <p-checkbox 
+                  [binary]="true" 
+                  [(ngModel)]="permiso.seleccionado"
+                ></p-checkbox>
+                <label>
+                  <span class="permiso-nombre">{{ permiso.nombre }}</span>
+                  <span class="permiso-descripcion">{{ permiso.descripcion }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Permisos de Grupo -->
+          <div class="permiso-categoria">
+            <div class="categoria-header" (click)="toggleCategoria('group')">
+              <i [class]="categoriasAbiertas['group'] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+              <strong>👥 Gestión del Grupo</strong>
+              <span class="categoria-count">{{ permisosGrupo.length }}</span>
+            </div>
+            <div class="permiso-items" *ngIf="categoriasAbiertas['group']">
+              <div *ngFor="let permiso of permisosGrupo" class="permiso-item">
+                <p-checkbox 
+                  [binary]="true" 
+                  [(ngModel)]="permiso.seleccionado"
+                  (onChange)="togglePermiso(permiso)"
+                  [inputId]="permiso.id.toString()"
+                ></p-checkbox>
+                <label [for]="permiso.id">
+                  <span class="permiso-nombre">{{ permiso.nombre }}</span>
+                  <span class="permiso-descripcion">{{ permiso.descripcion }}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Acciones rápidas -->
+      <div class="permiso-acciones">
+        <button type="button" pButton label="Seleccionar todos" icon="pi pi-check-square" class="p-button-text p-button-sm" (click)="seleccionarTodos()"></button>
+        <button type="button" pButton label="Deseleccionar todos" icon="pi pi-square" class="p-button-text p-button-sm" (click)="deseleccionarTodos()"></button>
       </div>
     </div>
+    
     <ng-template pTemplate="footer">
-      <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-text" (onClick)="mostrarDialogAgregar = false"></p-button>
-      <p-button label="Agregar" icon="pi pi-check" (onClick)="agregarUsuario()"></p-button>
+      <div class="dialog-footer">
+        <p-button label="Cancelar" icon="pi pi-times" styleClass="p-button-secondary" (onClick)="mostrarDialogAgregar = false"></p-button>
+        <p-button label="Agregar Usuario" icon="pi pi-check" styleClass="p-button-primary" (onClick)="agregarUsuario()" [disabled]="!nuevoUsuarioEmail"></p-button>
+      </div>
     </ng-template>
   </p-dialog>
 </div>
+
+<!-- antes de cambiar todo el codigo, se veia asi, pero se cambio para agregar permisos -->

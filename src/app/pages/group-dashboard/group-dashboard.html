@@ -8,7 +8,7 @@
     <div class="header-actions">
       <p-button label="Tablero Kanban" icon="pi pi-table" (onClick)="irAKanban()"></p-button>
       <p-button label="Filtros ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="VerListaTicket()"></p-button>
-      <p-button label="Nuevo Ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
+      <p-button *ifHasPermission="'tickets:add'" label="Nuevo Ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
       <p-button label="Gestión Grupo" icon="pi pi-cog" styleClass="p-button-secondary" (onClick)="Gestion()"></p-button>
     </div>
   </div>

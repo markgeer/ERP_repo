@@ -56,36 +56,39 @@ export class Login {
             localStorage.setItem('token', token);
             localStorage.setItem('user', JSON.stringify(user));
             
-            // Decodificar el token para obtener los permisos
+            // Decodificar el token
             const payload = JSON.parse(atob(token.split('.')[1]));
-            console.log('Token decodificado:', payload);
+            console.log('Permisos globales:', payload.globalPermissions);
+            console.log('Permisos por grupo:', payload.permissionsByGroup);
             
-            // Extraer permisos del token
+            // Mapear IDs de permisos a strings
+            const permisosMap: Record<number, string> = {
+              1: 'user:view', 2: 'user:add', 3: 'user:edit', 4: 'user:edit:profile',
+              5: 'user:delete', 6: 'user:manage', 7: 'group:view', 8: 'group:add',
+              9: 'group:edit', 10: 'group:delete', 11: 'group:manage',
+              12: 'tickets:view', 13: 'tickets:add', 14: 'tickets:edit', 15: 'tickets:delete',
+              16: 'tickets:edit:state', 17: 'tickets:edit:comment', 18: 'tickets:manage',
+              19: 'tickets:move', 20: 'group:add:member', 21: 'group:delete:member',
+              22: 'group:edit:config', 23: 'tickets:move:own'
+            };
+            
+            // ✅ SOLO permisos globales (sin permisos de grupo)
             let permisos: string[] = [];
-            
-            // Permisos globales del usuario
-            if (payload.globalPermissions) {
-              // Aquí mapeas los IDs de permisos a strings
-              // Por ahora, asignamos según el username
-              if (user.username === 'admin') {
-                permisos = [
-                  'groups-view', 'groups-add', 'groups-edit', 'groups-delete',
-                  'users-view', 'users-add', 'users-edit', 'users-delete',
-                  'tickets-view', 'tickets-add', 'tickets-edit', 'tickets-delete',
-                  'group-add', 'group-edit', 'group-delete'
-                ];
-              } else {
-                permisos = ['groups-view', 'tickets-view'];
-              }
+            if (payload.globalPermissions && payload.globalPermissions.length > 0) {
+              permisos = payload.globalPermissions.map((id: number) => permisosMap[id]).filter((p: string) => p);
             }
-            
+
+            if (permisos.length === 0) {
+              permisos = ['group:view', 'tickets:view'];
+            }
+
+            console.log('Permisos globales asignados:', permisos);
             this.permissionsSvc.setPermissions(permisos);
-            
+
             this.router.navigate(['/grupos-dashboard']);
           }
         },
         error: (error) => {
-          console.error(error);
           alert('Credenciales incorrectas');
         }
       });

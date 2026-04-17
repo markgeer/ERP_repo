@@ -11,76 +11,101 @@
     <p-card class="info-card">
       <div class="card-header">
         <h2>Información del Ticket</h2>
-        <p-button 
-          *ngIf="puedeEditar() && !editando" 
-          label="Editar" 
-          icon="pi pi-pencil" 
-          styleClass="p-button-text" 
-          (onClick)="editando = true">
-        </p-button>
-        <p-button 
-          *ngIf="editando" 
-          label="Guardar" 
-          icon="pi pi-save" 
-          styleClass="p-button-success" 
-          (onClick)="guardarCambios()">
-        </p-button>
+        <!-- Botón Editar - solo visible si tiene permiso y no está editando -->
+        @if (!editando) {
+          <p-button 
+            *ifHasPermission="'tickets:edit'"
+            label="Editar" 
+            icon="pi pi-pencil" 
+            styleClass="p-button-text" 
+            (onClick)="editando = true">
+          </p-button>
+        }
+        <!-- Botón Guardar - visible solo en modo edición -->
+        @if (editando) {
+          <p-button 
+            label="Guardar" 
+            icon="pi pi-save" 
+            styleClass="p-button-success" 
+            (onClick)="guardarCambios()">
+          </p-button>
+        }
       </div>
 
+      <!-- Título -->
       <div class="field">
         <label>Título</label>
-        <input *ngIf="editando && puedeEditar()" pInputText [(ngModel)]="ticket.titulo" />
-        <span *ngIf="!editando || !puedeEditar()">{{ ticket.titulo }}</span>
+        @if (editando) {
+          <input pInputText [(ngModel)]="ticket.titulo" class="w-full" />
+        } @else {
+          <span>{{ ticket.titulo }}</span>
+        }
       </div>
 
+      <!-- Descripción -->
       <div class="field">
         <label>Descripción</label>
-        <textarea *ngIf="editando && puedeEditar()" rows="5" pTextarea [(ngModel)]="ticket.descripcion"></textarea>
-        <span *ngIf="!editando || !puedeEditar()">{{ ticket.descripcion || 'Sin descripción' }}</span>
+        @if (editando) {
+          <textarea rows="5" pTextarea [(ngModel)]="ticket.descripcion" class="w-full"></textarea>
+        } @else {
+          <span>{{ ticket.descripcion || 'Sin descripción' }}</span>
+        }
       </div>
 
       <div class="form-row">
+        <!-- Estado - siempre visible pero solo editable con permiso -->
         <div class="field">
           <label>Estado</label>
-          <p-select 
-            *ngIf="puedeCambiarEstado()" 
-            [options]="estados" 
-            [(ngModel)]="ticket.estado" 
-            (onChange)="cambiarEstado(ticket.estado)">
-          </p-select>
-          <p-tag *ngIf="!puedeCambiarEstado()" [value]="ticket.estado" [severity]="getEstadoSeverity(ticket.estado)"></p-tag>
+          @if (permissionsSvc.hasPermission('tickets:edit:state')) {
+            <p-select 
+              [options]="estados" 
+              [(ngModel)]="ticket.estado" 
+              (onChange)="cambiarEstado(ticket.estado)">
+            </p-select>
+          } @else {
+            <p-tag [value]="ticket.estado" [severity]="getEstadoSeverity(ticket.estado)"></p-tag>
+          }
         </div>
 
+        <!-- Prioridad - editable solo en modo edición -->
         <div class="field">
           <label>Prioridad</label>
-          <p-select 
-            *ngIf="editando && puedeEditar()" 
-            [options]="prioridades" 
-            [(ngModel)]="ticket.prioridad">
-          </p-select>
-          <p-tag *ngIf="!editando || !puedeEditar()" [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)"></p-tag>
+          @if (editando) {
+            <p-select 
+              [options]="prioridades" 
+              [(ngModel)]="ticket.prioridad">
+            </p-select>
+          } @else {
+            <p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)"></p-tag>
+          }
         </div>
       </div>
 
       <div class="form-row">
+        <!-- Asignado a - editable solo en modo edición -->
         <div class="field">
           <label>Asignado a</label>
-          <p-select 
-            *ngIf="editando && puedeEditar()" 
-            [options]="usuarios" 
-            [(ngModel)]="ticket.asignadoA">
-          </p-select>
-          <span *ngIf="!editando || !puedeEditar()">{{ ticket.asignadoA || 'Sin asignar' }}</span>
+          @if (editando) {
+            <p-select 
+              [options]="usuarios" 
+              [(ngModel)]="ticket.asignadoA">
+            </p-select>
+          } @else {
+            <span>{{ ticket.asignadoA || 'Sin asignar' }}</span>
+          }
         </div>
 
+        <!-- Fecha límite - editable solo en modo edición -->
         <div class="field">
           <label>Fecha límite</label>
-          <p-datepicker 
-            *ngIf="editando && puedeEditar()" 
-            [(ngModel)]="ticket.fechaLimite" 
-            dateFormat="dd/mm/yy">
-          </p-datepicker>
-          <span *ngIf="!editando || !puedeEditar()">{{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</span>
+          @if (editando) {
+            <p-datepicker 
+              [(ngModel)]="ticket.fechaLimite" 
+              dateFormat="dd/mm/yy">
+            </p-datepicker>
+          } @else {
+            <span>{{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</span>
+          }
         </div>
       </div>
 
@@ -96,34 +121,45 @@
         <h2>Comentarios</h2>
         
         <div class="comentarios-list">
-          <div *ngFor="let comentario of ticket.comentarios" class="comentario-item">
-            <div class="comentario-header">
-              <strong>{{ comentario.usuario }}</strong>
-              <small>{{ comentario.fecha | date:'dd/MM/yyyy HH:mm' }}</small>
+          @for (comentario of ticket.comentarios; track comentario.fecha) {
+            <div class="comentario-item">
+              <div class="comentario-header">
+                <strong>{{ comentario.usuario }}</strong>
+                <small>{{ comentario.fecha | date:'dd/MM/yyyy HH:mm' }}</small>
+              </div>
+              <div class="comentario-texto">{{ comentario.texto }}</div>
             </div>
-            <div class="comentario-texto">{{ comentario.texto }}</div>
-          </div>
-          <div *ngIf="ticket.comentarios.length === 0" class="sin-comentarios">
-            Sin comentarios
-          </div>
+          }
+          @if (ticket.comentarios.length === 0) {
+            <div class="sin-comentarios">
+              Sin comentarios
+            </div>
+          }
         </div>
 
-        <div class="nuevo-comentario">
-          <textarea rows="3" pTextarea [(ngModel)]="nuevoComentario" placeholder="Escribe un comentario..."></textarea>
-          <p-button label="Agregar Comentario" icon="pi pi-send" (onClick)="agregarComentario()" [disabled]="!nuevoComentario.trim()"></p-button>
-        </div>
+        <!-- Agregar comentario - solo con tickets:edit:comment -->
+        @if (permissionsSvc.hasPermission('tickets:edit:comment')) {
+          <div class="nuevo-comentario">
+            <textarea rows="3" pTextarea [(ngModel)]="nuevoComentario" placeholder="Escribe un comentario..."></textarea>
+            <p-button label="Agregar Comentario" icon="pi pi-send" (onClick)="agregarComentario()" [disabled]="!nuevoComentario.trim()"></p-button>
+          </div>
+        }
       </p-card>
 
       <p-card class="historial-card">
         <h2>Historial de cambios</h2>
         <div class="historial-list">
-          <div *ngFor="let evento of ticket.historial" class="historial-item">
-            <i class="pi pi-history"></i>
-            <span>{{ evento }}</span>
-          </div>
-          <div *ngIf="ticket.historial.length === 0" class="sin-historial">
-            Sin historial
-          </div>
+          @for (evento of ticket.historial; track evento) {
+            <div class="historial-item">
+              <i class="pi pi-history"></i>
+              <span>{{ evento }}</span>
+            </div>
+          }
+          @if (ticket.historial.length === 0) {
+            <div class="sin-historial">
+              Sin historial
+            </div>
+          }
         </div>
       </p-card>
     </div>

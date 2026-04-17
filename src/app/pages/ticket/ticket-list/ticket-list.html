@@ -7,7 +7,7 @@
     <div class="header-actions">
       <p-button label="Tablero Kanban" icon="pi pi-table" styleClass="p-button-secondary" (onClick)="irAKanban()"></p-button>
       <p-button label="Dashboard" icon="pi pi-home" styleClass="p-button-secondary" (onClick)="irAGroupDashboard()"></p-button>
-      <p-button label="Nuevo Ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
+      <p-button *ifHasPermission="'tickets:add'" label="Nuevo Ticket" icon="pi pi-plus" styleClass="p-button-primary" (onClick)="crearTicket()"></p-button>
     </div>
   </div>
 
@@ -63,19 +63,20 @@
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-ticket>
-        <tr>
-          <td>{{ ticket.id }}</td>
-          <td>
-            <a class="ticket-link" (click)="verTicket(ticket.id)">{{ ticket.titulo }}</a>
-          </td>
-          <td><p-tag [value]="ticket.estado" [severity]="getEstadoSeverity(ticket.estado)"></p-tag></td>
-          <td><p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)"></p-tag></td>
-          <td>{{ ticket.asignadoA || 'Sin asignar' }}</td>
-          <td>{{ ticket.creadoPor }}</td>
-          <td>{{ ticket.fechaCreacion | date:'dd/MM/yyyy' }}</td>
-          <td>{{ ticket.fechaLimite | date:'dd/MM/yyyy' }}</td>
-        </tr>
-      </ng-template>
+      <tr>
+        <td>{{ ticket.id }}</td>
+        <td>{{ ticket.titulo }}</td>
+        <td><p-tag [value]="ticket.estado" [severity]="getEstadoSeverity(ticket.estado)"></p-tag></td>
+        <td><p-tag [value]="ticket.prioridad" [severity]="getPrioridadSeverity(ticket.prioridad)"></p-tag></td>
+        <td>{{ ticket.asignadoA }}</td>
+        <td>{{ ticket.creadoPor }}</td>
+        <td>{{ ticket.creado_en | date:'dd/MM/yyyy' }}</td>
+        <td>{{ ticket.fecha_limite | date:'dd/MM/yyyy' }}</td>
+        <td>
+          <p-button icon="pi pi-eye" (onClick)="verTicket(ticket.id)"></p-button>
+        </td>
+      </tr>
+    </ng-template>
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="8" class="text-center">No hay tickets disponibles</td>

@@ -48,13 +48,44 @@
   display: block;
 }
 
+.grupo-link {
+  color: #667eea;
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.grupo-link:hover {
+  text-decoration: underline;
+}
+
+.grupo-detalle h3 {
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+}
+
+.grupo-detalle h4 {
+  margin: 1rem 0 0.5rem 0;
+  color: #1e293b;
+}
+
+.detalle-info {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.detalle-info p {
+  margin: 0.5rem 0;
+}
+
 :host ::ng-deep .p-card {
   border-radius: 16px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 :host ::ng-deep .p-datatable .p-datatable-tbody > tr:hover {
-  background: #f8fafc;
+  background: #3c3c3c;
 }
 
 @media (max-width: 768px) {
